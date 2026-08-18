@@ -4,7 +4,7 @@ A reproducible computer-vision pipeline for classifying isolated A-Z American Si
 alphabet images, with checksummed data manifests, a compact PyTorch model, independent-domain
 evaluation, command-line inference, and an optional local demo.
 
-**Project website:** [ssavan99.github.io/sign-language-recognition](https://ssavan99.github.io/sign-language-recognition/)
+**Project website:** [ssavan99.github.io/sign-language-recognition](https://ssavan99.github.io/sign-language-recognition/) — free local browser inference with an optional camera or image upload.
 
 ![Local classifier showing a confident domain-shift failure](docs/demo/demo-screenshot.png)
 
@@ -82,8 +82,8 @@ Verify the environment:
 ```powershell
 asl-recognition doctor
 asl-recognition --help
-ruff check --no-cache src tests
-ruff format --check src tests
+ruff check --no-cache src tests tools
+ruff format --check src tests tools
 pytest --cov=asl_recognition --cov-report=term-missing --cov-fail-under=75
 ```
 
@@ -186,6 +186,14 @@ Open the printed local URL. Public sharing and public prediction APIs are disabl
 external-domain example reproduces the screenshot and keeps the measured limitation visible even
 when model confidence is high. See the [demo guide](docs/demo/README.md).
 
+## Browser website
+
+The free [GitHub Pages site](https://ssavan99.github.io/sign-language-recognition/) packages the
+released checkpoint's exact weights for dependency-free browser inference. It can classify an
+optional local camera frame or an uploaded image; those images remain in the browser. It has the
+same isolated-still-image scope and the same external-domain limitation shown in the evaluation
+report, and it is not a hand detector or an accessibility system.
+
 ## Repository structure
 
 ```text
@@ -194,8 +202,10 @@ tests/                     Generated-data unit and integration tests
 models/                    Released compact checkpoint and model card
 docs/results/current/      Maintained evaluation report and confusion matrices
 docs/demo/                 Local demo guide, CC0 sample, and real screenshot
+site/                      GitHub Pages browser classifier and published evidence assets
+tools/                     Browser-model export and parity verification scripts
 archive/notebooks/         Preserved exploratory notebooks; not the supported run path
-.github/workflows/ci.yml   Free generated-data CI checks
+.github/workflows/         Free CI and GitHub Pages deployment workflows
 ```
 
 ## Limitations

@@ -1,0 +1,334 @@
+{
+  "format": "asl-browser-cnn-v1",
+  "source_checkpoint_sha256": "8b3d071082615de4a21a6303c8e9ca5496a747c6f5707064f26b3d6a9f6c40a7",
+  "architecture": {
+    "name": "compact_asl_cnn_v1",
+    "num_classes": 26,
+    "channels": [
+      24,
+      48,
+      96
+    ],
+    "dropout": 0.2
+  },
+  "class_names": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z"
+  ],
+  "image_size": 64,
+  "normalization": {
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ]
+  },
+  "float_count": 165218,
+  "weight_sha256": "9a770178c99e9f443ed34e1f54483c7d4a9f7816707b8c102aaa1db9121fc337",
+  "tensors": [
+    {
+      "name": "features.0.0.weight",
+      "shape": [
+        24,
+        3,
+        3,
+        3
+      ],
+      "offset": 0,
+      "length": 648
+    },
+    {
+      "name": "features.0.1.weight",
+      "shape": [
+        24
+      ],
+      "offset": 648,
+      "length": 24
+    },
+    {
+      "name": "features.0.1.bias",
+      "shape": [
+        24
+      ],
+      "offset": 672,
+      "length": 24
+    },
+    {
+      "name": "features.0.1.running_mean",
+      "shape": [
+        24
+      ],
+      "offset": 696,
+      "length": 24
+    },
+    {
+      "name": "features.0.1.running_var",
+      "shape": [
+        24
+      ],
+      "offset": 720,
+      "length": 24
+    },
+    {
+      "name": "features.0.3.weight",
+      "shape": [
+        24,
+        24,
+        3,
+        3
+      ],
+      "offset": 744,
+      "length": 5184
+    },
+    {
+      "name": "features.0.4.weight",
+      "shape": [
+        24
+      ],
+      "offset": 5928,
+      "length": 24
+    },
+    {
+      "name": "features.0.4.bias",
+      "shape": [
+        24
+      ],
+      "offset": 5952,
+      "length": 24
+    },
+    {
+      "name": "features.0.4.running_mean",
+      "shape": [
+        24
+      ],
+      "offset": 5976,
+      "length": 24
+    },
+    {
+      "name": "features.0.4.running_var",
+      "shape": [
+        24
+      ],
+      "offset": 6000,
+      "length": 24
+    },
+    {
+      "name": "features.1.0.weight",
+      "shape": [
+        48,
+        24,
+        3,
+        3
+      ],
+      "offset": 6024,
+      "length": 10368
+    },
+    {
+      "name": "features.1.1.weight",
+      "shape": [
+        48
+      ],
+      "offset": 16392,
+      "length": 48
+    },
+    {
+      "name": "features.1.1.bias",
+      "shape": [
+        48
+      ],
+      "offset": 16440,
+      "length": 48
+    },
+    {
+      "name": "features.1.1.running_mean",
+      "shape": [
+        48
+      ],
+      "offset": 16488,
+      "length": 48
+    },
+    {
+      "name": "features.1.1.running_var",
+      "shape": [
+        48
+      ],
+      "offset": 16536,
+      "length": 48
+    },
+    {
+      "name": "features.1.3.weight",
+      "shape": [
+        48,
+        48,
+        3,
+        3
+      ],
+      "offset": 16584,
+      "length": 20736
+    },
+    {
+      "name": "features.1.4.weight",
+      "shape": [
+        48
+      ],
+      "offset": 37320,
+      "length": 48
+    },
+    {
+      "name": "features.1.4.bias",
+      "shape": [
+        48
+      ],
+      "offset": 37368,
+      "length": 48
+    },
+    {
+      "name": "features.1.4.running_mean",
+      "shape": [
+        48
+      ],
+      "offset": 37416,
+      "length": 48
+    },
+    {
+      "name": "features.1.4.running_var",
+      "shape": [
+        48
+      ],
+      "offset": 37464,
+      "length": 48
+    },
+    {
+      "name": "features.2.0.weight",
+      "shape": [
+        96,
+        48,
+        3,
+        3
+      ],
+      "offset": 37512,
+      "length": 41472
+    },
+    {
+      "name": "features.2.1.weight",
+      "shape": [
+        96
+      ],
+      "offset": 78984,
+      "length": 96
+    },
+    {
+      "name": "features.2.1.bias",
+      "shape": [
+        96
+      ],
+      "offset": 79080,
+      "length": 96
+    },
+    {
+      "name": "features.2.1.running_mean",
+      "shape": [
+        96
+      ],
+      "offset": 79176,
+      "length": 96
+    },
+    {
+      "name": "features.2.1.running_var",
+      "shape": [
+        96
+      ],
+      "offset": 79272,
+      "length": 96
+    },
+    {
+      "name": "features.2.3.weight",
+      "shape": [
+        96,
+        96,
+        3,
+        3
+      ],
+      "offset": 79368,
+      "length": 82944
+    },
+    {
+      "name": "features.2.4.weight",
+      "shape": [
+        96
+      ],
+      "offset": 162312,
+      "length": 96
+    },
+    {
+      "name": "features.2.4.bias",
+      "shape": [
+        96
+      ],
+      "offset": 162408,
+      "length": 96
+    },
+    {
+      "name": "features.2.4.running_mean",
+      "shape": [
+        96
+      ],
+      "offset": 162504,
+      "length": 96
+    },
+    {
+      "name": "features.2.4.running_var",
+      "shape": [
+        96
+      ],
+      "offset": 162600,
+      "length": 96
+    },
+    {
+      "name": "classifier.2.weight",
+      "shape": [
+        26,
+        96
+      ],
+      "offset": 162696,
+      "length": 2496
+    },
+    {
+      "name": "classifier.2.bias",
+      "shape": [
+        26
+      ],
+      "offset": 165192,
+      "length": 26
+    }
+  ]
+}

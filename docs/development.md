@@ -42,6 +42,20 @@ pytest --cov=asl_recognition --cov-report=term-missing --cov-fail-under=75
 
 The test suite uses generated images and does not download either full dataset. The doctor command reports exact package versions and whether CUDA is available. Training accepts `--device auto`, `--device cpu`, or `--device cuda`; an explicit unavailable CUDA request fails rather than silently switching devices.
 
+## Browser model release
+
+The GitHub Pages site runs a dependency-free JavaScript implementation over an exact float32
+export of the released checkpoint. Regenerate the browser assets after intentionally replacing the
+checkpoint, then verify parity with Node.js 16 or later:
+
+```powershell
+python tools/export_browser_model.py
+node tools/check_browser_model.mjs
+```
+
+The Python test suite checks that the published browser weights and manifest match the checkpoint
+byte-for-byte. The website uses the user's local camera or uploaded image only in the browser.
+
 ## No-download smoke workflow
 
 ```powershell

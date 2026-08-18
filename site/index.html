@@ -3,88 +3,37 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="A reproducible ASL alphabet image classifier with checksum-verified data, compact CNN inference, and honest external-domain evaluation.">
-    <title>ASL Alphabet Image Classifier</title>
+    <meta name="description" content="Run the released ASL alphabet classifier in your browser with live camera or image upload input, alongside its real evaluation evidence.">
+    <title>ASL Alphabet Field Lab</title>
     <link rel="stylesheet" href="styles.css">
+    <script type="module" src="app.mjs"></script>
   </head>
   <body>
-    <a class="skip-link" href="#main-content">Skip to content</a>
-    <header class="site-header">
-      <a class="brand" href="#top" aria-label="ASL Alphabet Image Classifier home"><span class="brand-mark" aria-hidden="true">ASL</span><span>Alphabet classifier</span></a>
-      <a class="header-link" href="https://github.com/Ssavan99/sign-language-recognition">View source</a>
-    </header>
-
-    <main id="main-content" tabindex="-1">
-      <section class="hero" id="top" aria-labelledby="hero-title">
-        <p class="eyebrow">Computer vision · reproducible research</p>
-        <h1 id="hero-title">ASL alphabet recognition with the failure modes left in view.</h1>
-        <p class="hero-copy">A compact PyTorch classifier for isolated A-Z American Sign Language images, built with checksummed manifests, deterministic evaluation, and a candid external-domain test.</p>
-        <div class="actions">
-          <a class="button button-primary" href="https://github.com/Ssavan99/sign-language-recognition">Explore the repository</a>
-          <a class="button button-secondary" href="#results">See the evaluation</a>
-        </div>
-        <p class="scope-note">Still images only. This is not continuous signing, translation, or an accessibility system.</p>
-      </section>
-
-      <section class="metrics" id="results" aria-labelledby="results-title">
-        <div class="section-heading">
-          <p class="eyebrow">Measured results</p>
-          <h2 id="results-title">One model, two very different conditions.</h2>
-        </div>
-        <div class="metric-grid">
-          <article class="metric-card metric-card-positive">
-            <p class="metric-label">Same-corpus test</p>
-            <p class="metric-value">99.82<span>%</span></p>
-            <p>15,572 of 15,600 images from the source dataset's untouched test partition.</p>
-          </article>
-          <article class="metric-card metric-card-warning">
-            <p class="metric-label">External capture source</p>
-            <p class="metric-value">17.56<span>%</span></p>
-            <p>137 of 780 images from a separately captured, CC0 A-Z dataset.</p>
-          </article>
-          <article class="metric-card">
-            <p class="metric-label">Released model</p>
-            <p class="metric-value">164,546</p>
-            <p>Parameters in a self-describing 64 × 64 RGB CNN checkpoint.</p>
-          </article>
-        </div>
-        <aside class="callout" aria-label="Evaluation limitation"><strong>The 82.26-point gap matters.</strong> High performance on controlled source images does not establish real-world, signer-independent, or accessibility-ready performance.</aside>
-      </section>
-
-      <section class="evidence" aria-labelledby="evidence-title">
-        <div class="evidence-copy">
-          <p class="eyebrow">Evidence over polish</p>
-          <h2 id="evidence-title">A confident wrong answer is part of the release.</h2>
-          <p>The local demo sample is truly labeled A, yet the released model predicts N with 75.9% confidence. The screenshot makes the domain-shift limitation concrete.</p>
-          <a class="text-link" href="https://github.com/Ssavan99/sign-language-recognition/blob/main/docs/results/current/README.md">Read the full evaluation report <span aria-hidden="true">→</span></a>
-        </div>
-        <figure class="demo-frame">
-          <img src="assets/demo-screenshot.png" alt="Local ASL alphabet demo showing an image labeled A classified as N at 75.9 percent confidence and an external-domain warning.">
-          <figcaption>Local demo capture using the released checkpoint and external sample.</figcaption>
-        </figure>
-      </section>
-
-      <section class="workflow" aria-labelledby="workflow-title">
-        <div class="section-heading">
-          <p class="eyebrow">Reproducible workflow</p>
-          <h2 id="workflow-title">Designed to make claims inspectable.</h2>
-        </div>
-        <ol class="workflow-list">
-          <li><strong>Prepare.</strong> Discover A-Z folders, record SHA-256 and dHash values, and preserve source test partitions.</li>
-          <li><strong>Train.</strong> Use a compact CNN with seeded augmentation, early stopping, and metadata-rich checkpoints.</li>
-          <li><strong>Evaluate.</strong> Recheck source bytes, reject exact cross-split duplicates, and report per-class results.</li>
-          <li><strong>Inspect.</strong> Run the CLI or optional local upload/webcam demo with the same preprocessing and class map.</li>
-        </ol>
-      </section>
-
-      <section class="closing" aria-labelledby="closing-title">
-        <p class="eyebrow">Run it locally</p>
-        <h2 id="closing-title">No account, payment, or hosted runtime required.</h2>
-        <p>The repository includes installation steps, generated-data smoke tests, a released checkpoint, and the optional loopback-only demo.</p>
-        <a class="button button-primary" href="https://github.com/Ssavan99/sign-language-recognition#install">Get started from the README</a>
-      </section>
-    </main>
-
-    <footer><span>ASL Alphabet Image Classifier</span><a href="https://github.com/Ssavan99/sign-language-recognition">GitHub repository</a></footer>
+    <div class="loader" id="loader" role="status" aria-live="polite"><div class="loader__inner"><span class="loader__label">Loading released model</span><span class="loader__bar"><span></span></span><span class="loader__status" id="loader-status">Preparing browser inference…</span></div></div>
+    <div class="page" id="page" aria-busy="true">
+      <a class="skip-link" href="#lab">Skip to live classifier</a>
+      <header class="masthead">
+        <a class="wordmark" href="#top"><span class="wordmark__glyph">ASL</span><span>field lab</span></a>
+        <nav aria-label="Primary navigation"><a href="#lab">Try it</a><a href="#evidence">Evidence</a><a href="https://github.com/Ssavan99/sign-language-recognition">Source</a></nav>
+      </header>
+      <main id="top">
+        <section class="hero" aria-labelledby="hero-title">
+          <div class="hero__copy"><p class="kicker">ASL ALPHABET / 64 × 64 / BROWSER INFERENCE</p><h1 id="hero-title">Show the model an image.<br><em>Keep the evidence visible.</em></h1><p class="hero__lede">A compact PyTorch classifier for isolated A-Z American Sign Language images, running entirely in the browser with its real external-domain result alongside it.</p><a class="button button--primary" href="#lab">Open the live classifier <span aria-hidden="true">↓</span></a></div>
+          <aside class="hero__note"><span class="note__index">01 / scope</span><p>Classifies isolated A–Z still images only. It does not detect hands, interpret continuous signing, or represent an accessibility-ready system.</p></aside>
+        </section>
+        <section class="lab" id="lab" aria-labelledby="lab-title">
+          <div class="section-head"><div><p class="kicker">LIVE INFERENCE</p><h2 id="lab-title">Bring an image to the model.</h2></div><p class="section-head__note">The 164,546-parameter CNN and preprocessing run locally after the ~661 KB weight file loads.</p></div>
+          <div class="workbench">
+            <section class="input-panel" aria-labelledby="input-title"><div class="panel-title"><span>Input</span><span id="input-source">External evaluation sample · true label A</span></div><h3 id="input-title" class="sr-only">Input controls</h3><div class="media-stage"><video id="camera" autoplay muted playsinline hidden aria-label="Live camera preview"></video><img id="still-image" src="assets/sample_external_a.jpg" alt="External evaluation sample with true label A"><div class="stage-grid" aria-hidden="true"></div></div><canvas id="model-input" width="64" height="64" aria-label="64 by 64 image provided to the model"></canvas><div class="input-actions"><button class="button button--primary" id="start-camera" type="button">Use camera</button><button class="button button--quiet" id="stop-camera" type="button" disabled>Stop camera</button><label class="button button--quiet upload-button" for="image-upload">Upload image<input id="image-upload" type="file" accept="image/*"></label></div><p class="privacy-note">Camera frames and uploaded images stay in this browser. Camera access is optional.</p></section>
+            <section class="prediction-panel" aria-labelledby="prediction-title"><div class="panel-title"><span>Prediction</span><span id="model-state">Loading model…</span></div><h3 id="prediction-title" class="prediction-label">—</h3><p class="prediction-confidence" id="prediction-confidence">Waiting for model weights</p><ol class="probabilities" id="probabilities" aria-label="Top three class probabilities"></ol><p class="prediction-status" id="prediction-status" role="status" aria-live="polite">The released checkpoint is loading.</p><aside class="lab-warning"><strong>Read this carefully.</strong> Confidence is not proof of correctness. The external sample shown at load is truly A but the model predicts N at 75.9%.</aside></section>
+          </div>
+        </section>
+        <section class="evidence" id="evidence" aria-labelledby="evidence-title"><div class="section-head"><div><p class="kicker">EVALUATION EVIDENCE</p><h2 id="evidence-title">The same checkpoint, under two conditions.</h2></div><p class="section-head__note">The matrices below are produced by the maintained evaluation pipeline, not decorative illustrations.</p></div><div class="evidence-grid"><figure class="evidence-card"><img src="assets/internal-confusion-matrix.png" alt="Confusion matrix for the 15,600-image same-corpus source test partition"><figcaption><span>Same-corpus source test</span><strong>99.82% accuracy · 15,600 images</strong><p>Optimistic result on the untouched test partition from the same controlled image source.</p></figcaption></figure><figure class="evidence-card"><img src="assets/external-confusion-matrix.png" alt="Confusion matrix for the 780-image separate external capture source"><figcaption><span>Separate external capture source</span><strong>17.56% accuracy · 780 images</strong><p>The 82.26-point drop is the central result: source performance does not travel well.</p></figcaption></figure></div></section>
+        <section class="failure" aria-labelledby="failure-title"><div class="failure__image"><img src="assets/sample_external_a.jpg" alt="The external evaluation image whose true label is A"></div><div class="failure__copy"><p class="kicker">CASE STUDY / EXTERNAL SAMPLE</p><h2 id="failure-title">True label: <span>A</span><br>Model output: <span>N / 75.9%</span></h2><p>This is the exact CC0 sample used in the local demo and loaded into the live classifier above. It is a useful reminder that a confident score can be confidently wrong when capture conditions change.</p><a href="https://github.com/Ssavan99/sign-language-recognition/blob/main/docs/results/current/README.md">Read the evaluated result report <span aria-hidden="true">→</span></a></div></section>
+        <section class="method" aria-labelledby="method-title"><div class="section-head"><div><p class="kicker">WHAT IS RUNNING HERE</p><h2 id="method-title">A small model with a traceable path.</h2></div></div><div class="method-grid"><article><span>01</span><h3>64 × 64 RGB</h3><p>Browser frames are resized and normalized with the released ImageNet preprocessing contract.</p></article><article><span>02</span><h3>Three conv blocks</h3><p>The same compact CNN weights as the released PyTorch checkpoint run locally as typed-array operations.</p></article><article><span>03</span><h3>Top-three output</h3><p>Softmax probabilities are shown for inspection, with no hand detector or hidden rejection system.</p></article></div></section>
+      </main>
+      <footer><p>ASL Alphabet Image Classifier · model SHA-256 <code>8b3d071…c40a7</code></p><p><a href="https://github.com/Ssavan99/sign-language-recognition">Source, model card, data contract, and reproducible workflow on GitHub</a></p></footer>
+    </div>
+    <noscript><p class="noscript">This page runs the model in the browser, so JavaScript must be enabled.</p></noscript>
   </body>
 </html>

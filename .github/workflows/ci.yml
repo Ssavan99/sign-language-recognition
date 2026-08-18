@@ -30,10 +30,10 @@ jobs:
         run: python -m pip check
 
       - name: Lint
-        run: ruff check --no-cache src tests
+        run: ruff check --no-cache src tests tools
 
       - name: Check formatting
-        run: ruff format --check src tests
+        run: ruff format --check src tests tools
 
       - name: Test generated-data workflow
         env:
