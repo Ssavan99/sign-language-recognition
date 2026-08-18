@@ -49,6 +49,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+.ruff_cache/
 cover/
 
 # Translations
@@ -154,8 +155,24 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# Dataset folders
-Datasets/
+# Repository-local dataset folders
+/Datasets/
+/data/
+
+Objective2/Models/
+
+# Local training and evaluation artifacts
+artifacts/
+/models/*
+!/models/README.md
+!/models/asl_alphabet_cnn_seed42.pt
+*.keras
+*.h5
+*.pkl
+
+# Operating-system metadata
+.DS_Store
+**/.DS_Store
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can

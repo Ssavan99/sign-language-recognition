@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      - name: Install project and test dependencies
+        run: python -m pip install -e ".[all]" -c constraints.txt
+
+      - name: Check dependency consistency
+        run: python -m pip check
+
+      - name: Lint
+        run: ruff check --no-cache src tests
+
+      - name: Check formatting
+        run: ruff format --check src tests
+
+      - name: Test generated-data workflow
+        env:
+          MPLBACKEND: Agg
+        run: pytest --cov=asl_recognition --cov-report=term-missing --cov-fail-under=75
