@@ -687,6 +687,8 @@ def read_manifest(path: Path) -> list[dict[str, str]]:
         relative = PurePosixPath(row["path"])
         if relative.is_absolute() or ".." in relative.parts or "\\" in row["path"]:
             raise ValueError(f"Unsafe path on manifest line {line_number}")
+        if relative.as_posix() != row["path"]:
+            raise ValueError(f"Non-canonical path on manifest line {line_number}: {row['path']}")
         if row["label"] not in CLASS_NAMES:
             raise ValueError(f"Unsupported label on manifest line {line_number}: {row['label']!r}")
         if row["split"] not in allowed_splits:
@@ -723,18 +725,17 @@ def verify_manifest_files(
 
     root = _require_directory(Path(source_root), "Dataset source root")
     rows = read_manifest(Path(manifest_path))
-    seen_paths: set[str] = set()
+    seen_paths: set[Path] = set()
     for line_number, row in enumerate(rows, start=2):
-        normalized_path = row["path"].casefold()
-        if normalized_path in seen_paths:
+        candidate = _resolve_manifest_image(root, row["path"])
+        if candidate in seen_paths:
             raise ValueError(f"Duplicate path on manifest line {line_number}: {row['path']}")
-        seen_paths.add(normalized_path)
+        seen_paths.add(candidate)
         if expected_split is not None and row["split"] != expected_split:
             raise ValueError(
                 f"Expected split {expected_split!r} on manifest line {line_number}, "
                 f"got {row['split']!r}"
             )
-        candidate = _resolve_manifest_image(root, row["path"])
         if not candidate.is_file():
             raise FileNotFoundError(f"Manifest image does not exist: {candidate}")
         actual_sha256 = _file_digest(candidate)
