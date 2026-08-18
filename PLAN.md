@@ -179,10 +179,10 @@ Acceptance criteria:
 
 ## Phase 9 - Separately gated original-repository visibility decision
 
-- [ ] Only after Phase 8, perform one fresh read-only check of the former repository's visibility and fork count.
-- [ ] Reconfirm GitHub's current documented effects of public-to-private conversion, including fork detachment and collaborator access behavior.
-- [ ] Assess whether the new repository's final implementation and framing are genuinely distinct enough that two public repositories would no longer be confusing.
-- [ ] Present the evidence and ask for explicit approval before any visibility change.
+- [x] Only after Phase 8, perform one fresh read-only check of the former repository's visibility and fork count.
+- [x] Reconfirm GitHub's current documented effects of public-to-private conversion, including fork detachment and collaborator access behavior.
+- [x] Assess whether the new repository's final implementation and framing are genuinely distinct enough that two public repositories would no longer be confusing.
+- [x] Present the evidence and ask for explicit approval before any visibility change.
 - [ ] If approved, change only the former repository's visibility to private; do not alter collaborators, branches, issues, settings, archive state, or content.
 - [ ] If approved and changed, verify visibility and existing collaborator access without modifying it.
 - [ ] If not approved, leave the former repository exactly as-is and record that decision.
