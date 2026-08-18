@@ -56,6 +56,13 @@ node tools/check_browser_model.mjs
 The Python test suite checks that the published browser weights and manifest match the checkpoint
 byte-for-byte. The website uses the user's local camera or uploaded image only in the browser.
 
+`tools/export_layer_responses.py` renders the published feature-map montage from the released
+checkpoint and the CC0 external A sample. Regenerate it only when either input changes:
+
+```powershell
+python tools/export_layer_responses.py
+```
+
 ## No-download smoke workflow
 
 ```powershell

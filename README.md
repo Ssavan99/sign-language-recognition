@@ -189,10 +189,16 @@ when model confidence is high. See the [demo guide](docs/demo/README.md).
 ## Browser website
 
 The free [GitHub Pages site](https://ssavan99.github.io/sign-language-recognition/) packages the
-released checkpoint's exact weights for dependency-free browser inference. It can classify an
-optional local camera frame or an uploaded image; those images remain in the browser. It has the
-same isolated-still-image scope and the same external-domain limitation shown in the evaluation
-report, and it is not a hand detector or an accessibility system.
+released checkpoint's exact weights for browser inference. It can classify an optional local
+camera frame, an uploaded image, or one of 26 selected CC0 external-capture samples; those images
+remain in the browser. The page also publishes its confusion matrices, exact evaluation counts,
+and real CNN layer-response views rather than separating the evidence from the demo.
+
+The camera panel provides visible framing, preview/model-mirroring, crop zoom, and an optional
+client-side MediaPipe hand-landmark crop. The optional crop is deliberately labeled experimental:
+it can improve framing but does not retrain the classifier or turn it into a reliable hand
+detector. The page has the same isolated-still-image scope and external-domain limitation shown in
+the evaluation report, and it is not an accessibility system.
 
 ## Repository structure
 
