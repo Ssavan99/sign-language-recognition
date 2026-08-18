@@ -4,6 +4,8 @@ A reproducible computer-vision pipeline for classifying isolated A-Z American Si
 alphabet images, with checksummed data manifests, a compact PyTorch model, independent-domain
 evaluation, command-line inference, and an optional local demo.
 
+**Project website:** [ssavan99.github.io/sign-language-recognition](https://ssavan99.github.io/sign-language-recognition/)
+
 ![Local classifier showing a confident domain-shift failure](docs/demo/demo-screenshot.png)
 
 The screenshot shows the released model predicting **N** at 75.9% confidence for an external

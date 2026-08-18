@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A reproducible ASL alphabet image classifier with checksum-verified data, compact CNN inference, and honest external-domain evaluation.">
+    <title>ASL Alphabet Image Classifier</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="ASL Alphabet Image Classifier home"><span class="brand-mark" aria-hidden="true">ASL</span><span>Alphabet classifier</span></a>
+      <a class="header-link" href="https://github.com/Ssavan99/sign-language-recognition">View source</a>
+    </header>
+
+    <main id="main-content" tabindex="-1">
+      <section class="hero" id="top" aria-labelledby="hero-title">
+        <p class="eyebrow">Computer vision · reproducible research</p>
+        <h1 id="hero-title">ASL alphabet recognition with the failure modes left in view.</h1>
+        <p class="hero-copy">A compact PyTorch classifier for isolated A-Z American Sign Language images, built with checksummed manifests, deterministic evaluation, and a candid external-domain test.</p>
+        <div class="actions">
+          <a class="button button-primary" href="https://github.com/Ssavan99/sign-language-recognition">Explore the repository</a>
+          <a class="button button-secondary" href="#results">See the evaluation</a>
+        </div>
+        <p class="scope-note">Still images only. This is not continuous signing, translation, or an accessibility system.</p>
+      </section>
+
+      <section class="metrics" id="results" aria-labelledby="results-title">
+        <div class="section-heading">
+          <p class="eyebrow">Measured results</p>
+          <h2 id="results-title">One model, two very different conditions.</h2>
+        </div>
+        <div class="metric-grid">
+          <article class="metric-card metric-card-positive">
+            <p class="metric-label">Same-corpus test</p>
+            <p class="metric-value">99.82<span>%</span></p>
+            <p>15,572 of 15,600 images from the source dataset's untouched test partition.</p>
+          </article>
+          <article class="metric-card metric-card-warning">
+            <p class="metric-label">External capture source</p>
+            <p class="metric-value">17.56<span>%</span></p>
+            <p>137 of 780 images from a separately captured, CC0 A-Z dataset.</p>
+          </article>
+          <article class="metric-card">
+            <p class="metric-label">Released model</p>
+            <p class="metric-value">164,546</p>
+            <p>Parameters in a self-describing 64 × 64 RGB CNN checkpoint.</p>
+          </article>
+        </div>
+        <aside class="callout" aria-label="Evaluation limitation"><strong>The 82.26-point gap matters.</strong> High performance on controlled source images does not establish real-world, signer-independent, or accessibility-ready performance.</aside>
+      </section>
+
+      <section class="evidence" aria-labelledby="evidence-title">
+        <div class="evidence-copy">
+          <p class="eyebrow">Evidence over polish</p>
+          <h2 id="evidence-title">A confident wrong answer is part of the release.</h2>
+          <p>The local demo sample is truly labeled A, yet the released model predicts N with 75.9% confidence. The screenshot makes the domain-shift limitation concrete.</p>
+          <a class="text-link" href="https://github.com/Ssavan99/sign-language-recognition/blob/main/docs/results/current/README.md">Read the full evaluation report <span aria-hidden="true">→</span></a>
+        </div>
+        <figure class="demo-frame">
+          <img src="assets/demo-screenshot.png" alt="Local ASL alphabet demo showing an image labeled A classified as N at 75.9 percent confidence and an external-domain warning.">
+          <figcaption>Local demo capture using the released checkpoint and external sample.</figcaption>
+        </figure>
+      </section>
+
+      <section class="workflow" aria-labelledby="workflow-title">
+        <div class="section-heading">
+          <p class="eyebrow">Reproducible workflow</p>
+          <h2 id="workflow-title">Designed to make claims inspectable.</h2>
+        </div>
+        <ol class="workflow-list">
+          <li><strong>Prepare.</strong> Discover A-Z folders, record SHA-256 and dHash values, and preserve source test partitions.</li>
+          <li><strong>Train.</strong> Use a compact CNN with seeded augmentation, early stopping, and metadata-rich checkpoints.</li>
+          <li><strong>Evaluate.</strong> Recheck source bytes, reject exact cross-split duplicates, and report per-class results.</li>
+          <li><strong>Inspect.</strong> Run the CLI or optional local upload/webcam demo with the same preprocessing and class map.</li>
+        </ol>
+      </section>
+
+      <section class="closing" aria-labelledby="closing-title">
+        <p class="eyebrow">Run it locally</p>
+        <h2 id="closing-title">No account, payment, or hosted runtime required.</h2>
+        <p>The repository includes installation steps, generated-data smoke tests, a released checkpoint, and the optional loopback-only demo.</p>
+        <a class="button button-primary" href="https://github.com/Ssavan99/sign-language-recognition#install">Get started from the README</a>
+      </section>
+    </main>
+
+    <footer><span>ASL Alphabet Image Classifier</span><a href="https://github.com/Ssavan99/sign-language-recognition">GitHub repository</a></footer>
+  </body>
+</html>
