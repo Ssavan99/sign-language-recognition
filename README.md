@@ -212,5 +212,5 @@ archive/notebooks/         Preserved exploratory notebooks; not the supported ru
 
 ## Licensing
 
-Dataset files remain subject to their publishers' licenses listed above. No project code license is
-currently granted because contributor licensing for the group-authored code has not been resolved.
+Dataset files remain subject to their publishers' licenses listed above. No license is currently
+provided for the project code.
