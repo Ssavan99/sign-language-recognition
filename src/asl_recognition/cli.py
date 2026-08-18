@@ -96,6 +96,21 @@ def build_parser() -> argparse.ArgumentParser:
     _add_device_argument(predict)
     predict.set_defaults(handler=_predict)
 
+    demo = subparsers.add_parser(
+        "demo", help="Launch the optional local image-upload/webcam interface."
+    )
+    demo.add_argument(
+        "--checkpoint",
+        type=_path,
+        default=_path("models/asl_alphabet_cnn_seed42.pt"),
+    )
+    demo.add_argument("--confidence-threshold", type=float, default=0.60)
+    demo.add_argument("--server-name", default="127.0.0.1")
+    demo.add_argument("--port", type=int, default=7860)
+    demo.add_argument("--inbrowser", action="store_true")
+    _add_device_argument(demo)
+    demo.set_defaults(handler=_demo)
+
     smoke = subparsers.add_parser(
         "smoke", help="Run a no-download prepare/train/evaluate/predict workflow."
     )
@@ -220,6 +235,19 @@ def _predict(args: argparse.Namespace) -> dict:
     result = predictor.predict(args.image, top_k=args.top_k)
     _print_result(result)
     return result
+
+
+def _demo(args: argparse.Namespace) -> dict:
+    from .demo import launch_demo
+
+    return launch_demo(
+        args.checkpoint,
+        device=args.device,
+        confidence_threshold=args.confidence_threshold,
+        server_name=args.server_name,
+        port=args.port,
+        inbrowser=args.inbrowser,
+    )
 
 
 def _smoke(args: argparse.Namespace) -> dict:
