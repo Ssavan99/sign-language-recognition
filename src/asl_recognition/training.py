@@ -75,6 +75,7 @@ def seed_everything(seed: int) -> None:
 
     if seed < 0:
         raise ValueError("seed must be non-negative")
+    os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
     os.environ["PYTHONHASHSEED"] = str(seed)
     random.seed(seed)
     np.random.seed(seed)
@@ -258,7 +259,9 @@ def train_model(
     loader_options = {
         "batch_size": batch_size,
         "num_workers": num_workers,
-        "pin_memory": selected_device.type == "cuda",
+        # Pinned host memory is optional and can destabilize older Windows WDDM
+        # CUDA drivers. The portable default favors reliable transfers.
+        "pin_memory": False,
         "worker_init_fn": _seed_worker if num_workers else None,
         "generator": generator,
         "persistent_workers": num_workers > 0,
