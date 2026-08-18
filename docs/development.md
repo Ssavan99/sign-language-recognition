@@ -35,12 +35,12 @@ No account, API token, hosted notebook, or paid service is needed.
 ```powershell
 asl-recognition doctor
 asl-recognition --help
-ruff check src tests
+ruff check --no-cache src tests
 ruff format --check src tests
-pytest
+pytest --cov=asl_recognition --cov-report=term-missing --cov-fail-under=75
 ```
 
-The doctor command reports exact package versions and whether CUDA is available. Training accepts `--device auto`, `--device cpu`, or `--device cuda`; an explicit unavailable CUDA request fails rather than silently switching devices.
+The test suite uses generated images and does not download either full dataset. The doctor command reports exact package versions and whether CUDA is available. Training accepts `--device auto`, `--device cpu`, or `--device cuda`; an explicit unavailable CUDA request fails rather than silently switching devices.
 
 ## No-download smoke workflow
 

@@ -126,13 +126,13 @@ Acceptance criteria:
 
 ## Phase 6 - Tests, CI, and quality controls
 
-- [ ] Add tests for configuration, manifests, path/layout validation, duplicate detection, preprocessing, inference shape/class mapping, and failure cases.
-- [ ] Add a CLI/inference integration smoke test using the tiny fixture or deterministic synthetic data.
-- [ ] Add formatting/lint/type checks only where they improve maintainability.
-- [ ] Add a public GitHub Actions workflow that uses free standard runners and never downloads full datasets or trains the full model.
-- [ ] Run the complete local test suite and verify CI configuration.
-- [ ] Perform a final secret, large-file, ignored-data, and notebook-output audit.
-- [ ] Update `SYNC.md` and review the phase diff with a reviewer subagent.
+- [x] Add tests for configuration, manifests, path/layout validation, duplicate detection, preprocessing, inference shape/class mapping, and failure cases.
+- [x] Add a CLI/inference integration smoke test using the tiny fixture or deterministic synthetic data.
+- [x] Add formatting/lint/type checks only where they improve maintainability.
+- [x] Add a public GitHub Actions workflow that uses free standard runners and never downloads full datasets or trains the full model.
+- [x] Run the complete local test suite and verify CI configuration.
+- [x] Perform a final secret, large-file, ignored-data, and notebook-output audit.
+- [x] Update `SYNC.md` and review the phase diff with a reviewer subagent.
 
 Acceptance criteria:
 
