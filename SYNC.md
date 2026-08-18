@@ -93,10 +93,10 @@ Reachable history includes commits under these identities:
 
 This history will be preserved without rewriting authors, commit emails, merge topology, or timestamps.
 
-## Reproducibility and validity findings
+## Historical reproducibility and validity findings
 
-- The visible `README.md` currently contains only a title.
-- There is no dependency manifest, package, CLI, test suite, CI workflow, saved model, class map, or fresh-machine run path.
+- The preserved historical README contained only a title before the revival work.
+- The historical project had no dependency manifest, package, CLI, test suite, CI workflow, saved model, class map, or fresh-machine run path.
 - Dataset acquisition hard-codes a local Kaggle CLI path and the incomplete notebook mounts Google Drive.
 - The data split is described as shuffled but is not shuffled, seeded, or recorded in a manifest.
 - Validation is mistakenly created from the augmented training generator.
@@ -114,4 +114,7 @@ The new origin is safely isolated. The checked-out feature branch begins exactly
 
 - Phase 1 passed independent preservation review. The full lineage is anchored at the new origin and no configured route to the former repository exists.
 - Phase 2 curation is complete after review fixes: all seven committed notebooks, the PDF, and six PNGs are exact renames; the incomplete local notebook is newly preserved under `archive/`; only `.DS_Store` metadata was removed; and both `/Datasets/` and `/data/` remain ignored.
-- The maintained package, evaluation artifacts, and demo do not exist yet. Documentation describes them as planned until their implementation phases pass review.
+- Phase 3 passed independent review after two corrective commits. The maintained package now provides anonymous acquisition, deterministic/checksummed manifests, exact and perceptual duplicate checks, a 164,546-parameter CNN, training/checkpointing, bounded-memory evaluation, reusable inference, and a six-command CLI plus a no-download CPU smoke workflow.
+- Training and evaluation verify every manifest row against the current source-file SHA-256 before consuming it, reject aliased/duplicate paths, and reject exact train/validation overlap. The bounded discovery logic accepts the existing ignored nested dataset without moving or committing it.
+- A clean Python 3.10 environment using pinned PyTorch 2.7.1/torchvision 0.22.1 CUDA 11.8 dependencies passed `pip check`, Ruff lint/format, compilation, deterministic manifest checks, and the full synthetic prepare/train/evaluate/predict smoke workflow. The smoke checkpoint is only test evidence and is not a reported model result.
+- Full-dataset training, independent evaluation artifacts, the optional local demo, tests/CI, and final README remain for later phases.

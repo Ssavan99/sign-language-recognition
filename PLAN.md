@@ -70,16 +70,16 @@ Acceptance criteria:
 
 ## Phase 3 - Build a reproducible data and model pipeline
 
-- [ ] Add a Python project/dependency manifest with supported-version guidance and deterministic commands.
-- [ ] Implement importable modules and CLI commands for data acquisition, preparation, training, evaluation, and prediction.
-- [ ] Implement anonymous public-dataset acquisition with a local-data override and checksum/layout validation.
-- [ ] Create deterministic stratified train/validation manifests with saved seed/configuration and an untouched test contract.
-- [ ] Add exact and perceptual cross-split duplicate checks; report what cannot be grouped by signer/session because source metadata is absent.
-- [ ] Ensure validation/test preprocessing is unaugmented and all relevant random seeds are set.
-- [ ] Replace the 17M/67M-parameter notebook models with a compact exportable classifier and class/preprocessing metadata.
-- [ ] Add early stopping/checkpointing and bounded-memory evaluation.
-- [ ] Add a fast CPU smoke mode that uses a tiny fixture and finishes without the full dataset.
-- [ ] Update `SYNC.md` and review the phase diff with a reviewer subagent.
+- [x] Add a Python project/dependency manifest with supported-version guidance and deterministic commands.
+- [x] Implement importable modules and CLI commands for data acquisition, preparation, training, evaluation, and prediction.
+- [x] Implement anonymous public-dataset acquisition with a local-data override and checksum/layout validation.
+- [x] Create deterministic stratified train/validation manifests with saved seed/configuration and an untouched test contract.
+- [x] Add exact and perceptual cross-split duplicate checks; report what cannot be grouped by signer/session because source metadata is absent.
+- [x] Ensure validation/test preprocessing is unaugmented and all relevant random seeds are set.
+- [x] Replace the 17M/67M-parameter notebook models with a compact exportable classifier and class/preprocessing metadata.
+- [x] Add early stopping/checkpointing and bounded-memory evaluation.
+- [x] Add a fast CPU smoke mode that uses a tiny fixture and finishes without the full dataset.
+- [x] Update `SYNC.md` and review the phase diff with a reviewer subagent.
 
 Acceptance criteria:
 
