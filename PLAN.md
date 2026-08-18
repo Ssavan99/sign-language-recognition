@@ -110,12 +110,12 @@ Acceptance criteria:
 
 ## Phase 5 - Add the local inference demo
 
-- [ ] Implement a small local Gradio image-upload/webcam interface over the shared inference module.
-- [ ] Show predicted letter, confidence, and concise static-image/domain limitations in the UI.
-- [ ] Handle missing model, invalid image, no detected/usable hand image, and low-confidence cases without crashing or overclaiming.
-- [ ] Add a deterministic sample invocation and capture a real screenshot for the README.
-- [ ] Keep the demo optional so core tests and package use do not require launching a server.
-- [ ] Update `SYNC.md` and review the phase diff with a frontend/code-review subagent.
+- [x] Implement a small local Gradio image-upload/webcam interface over the shared inference module.
+- [x] Show predicted letter, confidence, and concise static-image/domain limitations in the UI.
+- [x] Handle missing model, invalid image, no detected/usable hand image, and low-confidence cases without crashing or overclaiming.
+- [x] Add a deterministic sample invocation and capture a real screenshot for the README.
+- [x] Keep the demo optional so core tests and package use do not require launching a server.
+- [x] Update `SYNC.md` and review the phase diff with a frontend/code-review subagent.
 
 Acceptance criteria:
 
