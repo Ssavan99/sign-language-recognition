@@ -2,7 +2,7 @@
 
 An isolated-image computer-vision project for classifying American Sign Language alphabet gestures.
 
-The repository now includes a reproducible data, training, evaluation, and command-line inference workflow. Historical notebooks and their recorded outputs remain available under [`archive/`](archive/README.md), but they are not the supported execution path and should not be treated as independent-domain validation. Full-data validation and the local demo are still being completed on this branch.
+The repository now includes a reproducible data, training, evaluation, and command-line inference workflow plus a released compact model. Historical notebooks and their recorded outputs remain available under [`archive/`](archive/README.md), but they are not the supported execution path and should not be treated as independent-domain validation. The optional local demo is still being completed on this branch.
 
 ## Current scope
 
@@ -10,8 +10,11 @@ The repository now includes a reproducible data, training, evaluation, and comma
 - Historical landmark, custom CNN, transfer-learning, and feature-extraction experiments
 - Same-corpus historical results with documented limitations
 - A maintained deterministic pipeline with a no-download smoke workflow
-- Full-data validation and a local demo currently under implementation on this branch
+- A released 164,546-parameter model with full-data internal and external evaluation
+- A local demo currently under implementation on this branch
 
 The project does not perform continuous signing, sentence translation, or validated real-world accessibility deployment. Motion-dependent letters such as J and Z are a known limitation of still-image classification.
 
-See [`PLAN.md`](PLAN.md) for the active implementation plan, [`SYNC.md`](SYNC.md) for preservation and audit evidence, [`docs/data.md`](docs/data.md) for the canonical data contract, and [`docs/development.md`](docs/development.md) for the verified environment and smoke command. A complete results and usage guide will replace this transition README after full-data validation and demo verification.
+The model reaches 99.82% accuracy on the same-corpus source test partition but only 17.56% on a separate external capture source. The gap is documented as a domain-generalization failure, not hidden behind the internal score. See the [current result report](docs/results/current/README.md) and [model card](models/README.md) for the full evaluation contract.
+
+See [`PLAN.md`](PLAN.md) for the active implementation plan, [`SYNC.md`](SYNC.md) for preservation and audit evidence, [`docs/data.md`](docs/data.md) for the canonical data contract, and [`docs/development.md`](docs/development.md) for the verified environment and smoke command. A complete results and usage guide will replace this transition README after demo and repository verification.

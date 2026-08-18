@@ -22,4 +22,4 @@ The maintained pipeline lives under `src/` and exposes deterministic command-lin
 - The original report is stored at `docs/report/asl-sign-language-analysis.pdf`.
 - Historical result figures are stored under `docs/results/historical/`.
 
-These artifacts preserve the original analysis and contributor context. Current project scope and revival status are documented in the root README; maintained full-data evaluation outputs will be added only after their validation phase is complete.
+These artifacts preserve the original analysis and contributor context. Current project scope and revival status are documented in the root README; maintained full-data evaluation outputs are reported separately under [`docs/results/current/`](../docs/results/current/README.md).
