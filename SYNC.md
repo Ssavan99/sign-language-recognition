@@ -134,4 +134,8 @@ The new origin is safely isolated. The checked-out feature branch begins exactly
 - A Git-exported copy with no repository metadata, ignored data, caches, or untracked state installed successfully into the verified environment. From that copy, doctor/help, Ruff, all 26 tests, the exact default smoke command, the exact sample prediction, demo help, and Gradio Blocks construction passed. The deterministic sample reproduced N at 75.8839%.
 - The README contains no personal, group/team, student/course, class-project, or authorship narrative; it makes no sole-authorship claim, uses no filler badges, and states only that no license is currently provided for project code.
 - Phase 7 passed independent documentation review at corrective commit `db0a6f8` with no remaining findings.
-- Final full-branch review, publication to the new origin, hosted CI, and pull-request creation remain.
+- Phase 8 final review passed at `c9673a9` with no publication blocker. The reviewer reconfirmed the preserved ancestry/merge parents and contributor metadata, byte-identical archive moves, code/model/demo evidence, focused revival commits, neutral licensing posture, data/secret/size boundaries, and clean worktree.
+- GitHub reported `Ssavan99/sign-language-recognition` as public and standalone (`isFork: false`, `parent: null`) with `main` as the default branch. The only configured local remote remains that new repository.
+- `revive/portfolio-ready-pipeline` was pushed to the new origin, preserving the full historical lineage. Pull request [#1](https://github.com/Ssavan99/sign-language-recognition/pull/1) is open against `main` with an accurate summary and verification record and remains unmerged.
+- The hosted `CI/test (pull_request)` job passed on the free standard runner in 2m10s. No action has been taken on the former repository.
+- Only the separately gated former-repository visibility decision remains.

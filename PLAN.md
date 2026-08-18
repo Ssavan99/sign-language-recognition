@@ -163,13 +163,13 @@ Acceptance criteria:
 
 ## Phase 8 - Final review and ship to the new repository
 
-- [ ] Review the full feature-branch diff, commit history, generated artifacts, and `PLAN.md` completion state.
-- [ ] Run all tests/checks one final time.
-- [ ] Confirm the only remote is the new standalone repository and GitHub still reports it is not a fork.
-- [ ] Make small focused commits with the configured user identity; never amend published historical commits.
-- [ ] Push the feature branch to the new origin.
-- [ ] Open a pull request against `main` in `Ssavan99/sign-language-recognition` with an accurate summary and verification evidence.
-- [ ] Leave the pull request unmerged for the user.
+- [x] Review the full feature-branch diff, commit history, generated artifacts, and `PLAN.md` completion state.
+- [x] Run all tests/checks one final time.
+- [x] Confirm the only remote is the new standalone repository and GitHub still reports it is not a fork.
+- [x] Make small focused commits with the configured user identity; never amend published historical commits.
+- [x] Push the feature branch to the new origin.
+- [x] Open a pull request against `main` in `Ssavan99/sign-language-recognition` with an accurate summary and verification evidence.
+- [x] Leave the pull request unmerged for the user.
 
 Acceptance criteria:
 
