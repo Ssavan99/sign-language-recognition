@@ -91,14 +91,14 @@ Acceptance criteria:
 
 ## Phase 4 - Validate and record defensible results
 
-- [ ] Verify the existing local dataset layout and correct the extra nesting without committing data.
-- [ ] Run smoke tests before full training.
-- [ ] Train the compact model locally with recorded environment, seed, configuration, duration, and artifact hash.
-- [ ] Evaluate the internal same-corpus holdout with accuracy, macro F1, per-class metrics, confusion matrix, model size, and latency.
-- [ ] Evaluate on the separate external-domain dataset if its anonymous access, license, and class mapping pass validation.
-- [ ] Clearly separate historical notebook metrics from new reproducible metrics and label same-corpus versus external-domain results.
-- [ ] Remove or correct any claim unsupported by the recorded artifacts, especially the invalid two-class transfer-learning result.
-- [ ] Update `SYNC.md` and review results/code with an AI/code-review subagent.
+- [x] Verify the existing local dataset layout and correct the extra nesting without committing data.
+- [x] Run smoke tests before full training.
+- [x] Train the compact model locally with recorded environment, seed, configuration, duration, and artifact hash.
+- [x] Evaluate the internal same-corpus holdout with accuracy, macro F1, per-class metrics, confusion matrix, model size, and latency.
+- [x] Evaluate on the separate external-domain dataset if its anonymous access, license, and class mapping pass validation.
+- [x] Clearly separate historical notebook metrics from new reproducible metrics and label same-corpus versus external-domain results.
+- [x] Remove or correct any claim unsupported by the recorded artifacts, especially the invalid two-class transfer-learning result.
+- [x] Update `SYNC.md` and review results/code with an AI/code-review subagent.
 
 Acceptance criteria:
 
