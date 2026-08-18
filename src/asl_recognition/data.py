@@ -76,16 +76,17 @@ def _has_all_class_directories(path: Path) -> bool:
 
 
 def _discover_class_roots(source_root: Path) -> list[_ClassRoot]:
-    """Find A-Z class roots at the root or through one wrapper directory.
+    """Find A-Z class roots through a small, bounded wrapper hierarchy.
 
-    Two wrapper levels cover both ``asl_alphabet_train/A`` and the common
+    Three wrapper levels cover both ``asl_alphabet_train/A`` and the common
     extracted ``asl_alphabet_train/asl_alphabet_train/A`` layout, as well as a
-    dataset wrapper around conventional ``train/A`` and ``test/A`` roots.
+    dataset wrapper around conventional ``train/A`` and ``test/A`` roots. The
+    bound also accepts this repository's historical double-wrapper extraction.
     """
 
     candidates: list[Path] = []
     frontier = [source_root]
-    for depth in range(3):
+    for depth in range(4):
         next_frontier: list[Path] = []
         for directory in sorted(
             frontier, key=lambda item: (item.as_posix().casefold(), item.as_posix())
@@ -93,7 +94,7 @@ def _discover_class_roots(source_root: Path) -> list[_ClassRoot]:
             if _has_all_class_directories(directory):
                 candidates.append(directory)
                 continue
-            if depth < 2:
+            if depth < 3:
                 try:
                     next_frontier.extend(child for child in directory.iterdir() if child.is_dir())
                 except OSError as exc:
@@ -107,7 +108,7 @@ def _discover_class_roots(source_root: Path) -> list[_ClassRoot]:
         expected = ", ".join(CLASS_NAMES)
         raise DatasetLayoutError(
             f"No directory containing all A-Z class folders was found within "
-            f"two levels of {source_root}. Expected immediate folders: {expected}."
+            f"three levels of {source_root}. Expected immediate folders: {expected}."
         )
     return [_ClassRoot(path, _role_for_root(path, source_root)) for path in unique]
 
@@ -699,6 +700,52 @@ def read_manifest(path: Path) -> list[dict[str, str]]:
     return rows
 
 
+def _resolve_manifest_image(source_root: Path, relative_path: str) -> Path:
+    candidate = (source_root / Path(*PurePosixPath(relative_path).parts)).resolve()
+    try:
+        candidate.relative_to(source_root)
+    except ValueError as exc:
+        raise ValueError(f"Manifest path escapes source root: {relative_path}") from exc
+    return candidate
+
+
+def verify_manifest_files(
+    manifest_path: Path,
+    source_root: Path,
+    expected_split: str | None = None,
+) -> list[dict[str, str]]:
+    """Verify manifest identity against source files before a model consumes it.
+
+    Verification is intentionally performed once before a training or evaluation
+    run rather than on every batch. This keeps data loading inexpensive while
+    ensuring the recorded manifest still describes the bytes on disk.
+    """
+
+    root = _require_directory(Path(source_root), "Dataset source root")
+    rows = read_manifest(Path(manifest_path))
+    seen_paths: set[str] = set()
+    for line_number, row in enumerate(rows, start=2):
+        normalized_path = row["path"].casefold()
+        if normalized_path in seen_paths:
+            raise ValueError(f"Duplicate path on manifest line {line_number}: {row['path']}")
+        seen_paths.add(normalized_path)
+        if expected_split is not None and row["split"] != expected_split:
+            raise ValueError(
+                f"Expected split {expected_split!r} on manifest line {line_number}, "
+                f"got {row['split']!r}"
+            )
+        candidate = _resolve_manifest_image(root, row["path"])
+        if not candidate.is_file():
+            raise FileNotFoundError(f"Manifest image does not exist: {candidate}")
+        actual_sha256 = _file_digest(candidate)
+        if actual_sha256 != row["sha256"]:
+            raise ValueError(
+                f"SHA-256 mismatch for manifest image {row['path']}: "
+                f"expected {row['sha256']}, got {actual_sha256}"
+            )
+    return rows
+
+
 def build_transforms(image_size: int, training: bool):
     """Build augmentation-only training or deterministic evaluation transforms."""
 
@@ -756,11 +803,7 @@ class ManifestImageDataset:
             raise RuntimeError("Loading images requires Pillow.") from exc
 
         row = self.rows[index]
-        candidate = (self.source_root / Path(*PurePosixPath(row["path"]).parts)).resolve()
-        try:
-            candidate.relative_to(self.source_root)
-        except ValueError as exc:
-            raise ValueError(f"Manifest path escapes source root: {row['path']}") from exc
+        candidate = _resolve_manifest_image(self.source_root, row["path"])
         if not candidate.is_file():
             raise FileNotFoundError(f"Manifest image does not exist: {candidate}")
         try:

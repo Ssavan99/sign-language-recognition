@@ -20,7 +20,7 @@ from torch.optim import AdamW
 from torch.utils.data import DataLoader, Dataset, Subset
 
 from .constants import CLASS_NAMES
-from .data import ManifestImageDataset, build_transforms, read_manifest
+from .data import ManifestImageDataset, build_transforms, verify_manifest_files
 from .model import build_model, count_parameters, save_checkpoint
 
 
@@ -175,24 +175,15 @@ def _environment(device: torch.device) -> dict[str, Any]:
     return result
 
 
-def _validate_manifest(path: Path, expected_split: str) -> int:
-    records = read_manifest(path)
+def _validate_manifest(path: Path, source_root: Path, expected_split: str) -> list[dict[str, str]]:
+    records = verify_manifest_files(path, source_root, expected_split)
     if not records:
         raise ValueError(f"manifest contains no rows: {path}")
     labels = {str(record["label"]) for record in records}
     unknown = labels.difference(CLASS_NAMES)
     if unknown:
         raise ValueError(f"manifest contains unknown labels: {sorted(unknown)}")
-    mismatched = {
-        str(record["split"])
-        for record in records
-        if str(record.get("split", expected_split)) != expected_split
-    }
-    if mismatched:
-        raise ValueError(
-            f"{expected_split} manifest contains other split values: {sorted(mismatched)}"
-        )
-    return len(records)
+    return records
 
 
 def train_model(
@@ -229,9 +220,19 @@ def train_model(
 
     train_manifest = _resolve_manifest(manifest_dir, "train")
     validation_manifest = _resolve_manifest(manifest_dir, "validation")
+    train_records = _validate_manifest(train_manifest, source_root, "train")
+    validation_records = _validate_manifest(validation_manifest, source_root, "validation")
+    train_hashes = {record["sha256"] for record in train_records}
+    validation_hashes = {record["sha256"] for record in validation_records}
+    overlap = train_hashes.intersection(validation_hashes)
+    if overlap:
+        raise ValueError(
+            "train and validation manifests contain exact duplicate image bytes "
+            f"({len(overlap)} shared SHA-256 values)"
+        )
     raw_counts = {
-        "train": _validate_manifest(train_manifest, "train"),
-        "validation": _validate_manifest(validation_manifest, "validation"),
+        "train": len(train_records),
+        "validation": len(validation_records),
     }
     selected_device = resolve_device(device)
     seed_everything(seed)

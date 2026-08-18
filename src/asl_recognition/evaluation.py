@@ -14,7 +14,7 @@ from matplotlib.figure import Figure
 from torch.utils.data import DataLoader
 
 from .constants import CLASS_NAMES
-from .data import ManifestImageDataset, build_transforms, read_manifest
+from .data import ManifestImageDataset, build_transforms, verify_manifest_files
 from .model import count_parameters, load_checkpoint, preprocessing_contract
 from .training import resolve_device
 
@@ -200,7 +200,7 @@ def evaluate_model(
     image_size = int(checkpoint["image_size"])
     if checkpoint["preprocessing"] != preprocessing_contract(image_size):
         raise ValueError("checkpoint preprocessing contract is unsupported or inconsistent")
-    records = read_manifest(manifest_path)
+    records = verify_manifest_files(manifest_path, source_root)
     if not records:
         raise ValueError("evaluation manifest contains no rows")
     unknown_labels = {str(row["label"]) for row in records}.difference(class_names)
