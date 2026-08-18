@@ -163,7 +163,9 @@ Objective2/Models/
 
 # Local training and evaluation artifacts
 artifacts/
-models/
+/models/*
+!/models/README.md
+!/models/asl_alphabet_cnn_seed42.pt
 *.keras
 *.h5
 *.pkl
