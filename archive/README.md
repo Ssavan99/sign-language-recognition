@@ -2,7 +2,7 @@
 
 This directory preserves the original exploratory notebooks and their recorded outputs. They are retained for historical context and are not the supported execution path.
 
-The planned maintained pipeline will live under `src/` and expose deterministic command-line workflows for data preparation, training, evaluation, and prediction. Until that pipeline is implemented and verified, this archive is the only preserved experimental record. Historical metrics are not directly comparable with future maintained-pipeline metrics unless their data split and evaluation scope match.
+The maintained pipeline lives under `src/` and exposes deterministic command-line workflows for data preparation, training, evaluation, and prediction. Historical metrics are not directly comparable with maintained-pipeline metrics unless their data split and evaluation scope match.
 
 ## Notebook index
 
@@ -22,4 +22,4 @@ The planned maintained pipeline will live under `src/` and expose deterministic 
 - The original report is stored at `docs/report/asl-sign-language-analysis.pdf`.
 - Historical result figures are stored under `docs/results/historical/`.
 
-These artifacts preserve the original analysis and contributor context. Current project scope and revival status are documented in the root README; maintained evaluation outputs will be added only after the new pipeline is implemented and verified.
+These artifacts preserve the original analysis and contributor context. Current project scope and revival status are documented in the root README; maintained full-data evaluation outputs will be added only after their validation phase is complete.
