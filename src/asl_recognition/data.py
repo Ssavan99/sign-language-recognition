@@ -193,7 +193,8 @@ def _dhash_file(path: Path) -> str:
     try:
         with Image.open(path) as image:
             grayscale = image.convert("L").resize((9, 8), Image.Resampling.LANCZOS)
-            pixels = list(grayscale.getdata())
+            flattened = getattr(grayscale, "get_flattened_data", None)
+            pixels = list(flattened() if flattened is not None else grayscale.getdata())
     except (OSError, UnidentifiedImageError) as exc:
         raise DatasetLayoutError(f"Image is unreadable or invalid: {path} ({exc})") from exc
 
