@@ -35,6 +35,7 @@ def test_doctor_outputs_json(capsys: pytest.CaptureFixture[str]) -> None:
 def test_synthetic_end_to_end_smoke(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     original = smoke.generate_fixture
 
@@ -42,7 +43,22 @@ def test_synthetic_end_to_end_smoke(
         return original(output_root, images_per_class=3, image_size=48, seed=seed)
 
     monkeypatch.setattr(smoke, "generate_fixture", tiny_fixture)
-    result = smoke.run_smoke_workflow(tmp_path / "smoke", seed=23, device="cpu")
+    output_dir = tmp_path / "smoke"
+    assert (
+        main(
+            [
+                "smoke",
+                "--output-dir",
+                str(output_dir),
+                "--seed",
+                "23",
+                "--device",
+                "cpu",
+            ]
+        )
+        == 0
+    )
+    result = json.loads(capsys.readouterr().out)
 
     assert result["status"] == "ok"
     assert result["preparation"]["counts"]["per_split"] == {

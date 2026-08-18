@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import json
 import shutil
 from pathlib import Path
 
@@ -111,6 +112,68 @@ def test_identical_bytes_under_different_labels_are_rejected(tmp_path: Path) -> 
 
     with pytest.raises(DatasetLayoutError, match="different class labels"):
         prepare_manifests(source, tmp_path / "manifests", near_duplicate_threshold=0)
+
+
+def _source_partition_fixture(tmp_path: Path) -> Path:
+    from PIL import Image
+
+    source = tmp_path / "source"
+    train_fixture = generate_fixture(
+        tmp_path / "generated-train", images_per_class=3, image_size=48, seed=31
+    )
+    test_fixture = generate_fixture(
+        tmp_path / "generated-test", images_per_class=1, image_size=48, seed=73
+    )
+    shutil.copytree(train_fixture, source / "wrapper" / "train")
+    shutil.copytree(test_fixture, source / "wrapper" / "test")
+    for path in (source / "wrapper" / "test").glob("*/*.png"):
+        with Image.open(path) as opened:
+            image = opened.convert("RGB")
+        image.putpixel((0, 0), (1, 2, 3))
+        image.save(path)
+    return source
+
+
+def test_nested_source_test_partition_is_preserved(tmp_path: Path) -> None:
+    source = _source_partition_fixture(tmp_path)
+    manifests = tmp_path / "manifests"
+    result = prepare_manifests(
+        source,
+        manifests,
+        seed=11,
+        train_ratio=0.60,
+        validation_ratio=0.20,
+        test_ratio=0.20,
+        near_duplicate_threshold=0,
+    )
+    test_rows = read_manifest(manifests / "test.csv")
+
+    assert result["layout"] == "source_partitions"
+    assert len(test_rows) == 26
+    assert all(row["path"].startswith("wrapper/test/") for row in test_rows)
+    assert {row["label"] for row in test_rows} == set(CLASS_NAMES)
+
+
+def test_exact_duplicate_crossing_source_partitions_is_rejected(tmp_path: Path) -> None:
+    source = _source_partition_fixture(tmp_path)
+    shutil.copyfile(
+        source / "wrapper" / "train" / "A" / "a_00.png",
+        source / "wrapper" / "test" / "A" / "a_00.png",
+    )
+
+    with pytest.raises(DatasetLayoutError, match="crosses source-provided partitions"):
+        prepare_manifests(source, tmp_path / "manifests", near_duplicate_threshold=0)
+
+
+def test_exact_duplicate_group_stays_in_one_generated_split(tmp_path: Path) -> None:
+    source = generate_fixture(tmp_path, images_per_class=4, image_size=48, seed=19)
+    shutil.copyfile(source / "A" / "a_00.png", source / "A" / "a_duplicate.png")
+    result = prepare_manifests(source, tmp_path / "manifests", near_duplicate_threshold=0)
+    report = json.loads(Path(result["duplicate_report_path"]).read_text(encoding="utf-8"))
+
+    assert report["exact_cross_split_duplicates"] == 0
+    assert report["exact_duplicate_group_count"] == 1
+    assert report["exact_duplicate_extra_image_count"] == 1
 
 
 @pytest.mark.parametrize(
