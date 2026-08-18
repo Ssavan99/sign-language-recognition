@@ -196,4 +196,4 @@ Acceptance criteria:
 
 ## Blockers
 
-None at the approval gate. Full-model training and external-domain evaluation remain resource/runtime risks, but each has a smoke-mode fallback that preserves truthful documentation without introducing paid compute or account requirements.
+None. Full-model training and external-domain evaluation completed locally; the generated-data smoke workflow remains the fast, no-download verification path.
