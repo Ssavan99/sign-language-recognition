@@ -142,17 +142,17 @@ Acceptance criteria:
 
 ## Phase 7 - Write the portfolio-quality README and supporting docs
 
-- [ ] Replace the README with a precise title and one-line isolated-ASL-image-classification pitch.
-- [ ] Include the real demo screenshot or representative generated result near the top.
-- [ ] Explain scope, pipeline, repository structure, dataset sources/licenses, model/evaluation design, and exact run commands.
-- [ ] Include a results table that distinguishes historical same-corpus results, new same-corpus results, and any external-domain result.
-- [ ] Document install, anonymous data acquisition, smoke mode, training, evaluation, CLI prediction, and local demo commands literally.
-- [ ] Document honest limitations: isolated still images, controlled-source bias, absent signer/session metadata, J/Z motion, no continuous signing/translation, and no validated accessibility deployment claim.
-- [ ] Use neutral project voice; omit personal/class-project narrative and authorship claims.
-- [ ] State that no project code license is provided unless contributor licensing is explicitly resolved.
-- [ ] Use no filler badges.
-- [ ] Follow the README exactly on a clean/simulated-fresh path and correct any mismatch.
-- [ ] Update `SYNC.md` and review the documentation diff with a reviewer subagent.
+- [x] Replace the README with a precise title and one-line isolated-ASL-image-classification pitch.
+- [x] Include the real demo screenshot or representative generated result near the top.
+- [x] Explain scope, pipeline, repository structure, dataset sources/licenses, model/evaluation design, and exact run commands.
+- [x] Include a results table that distinguishes historical same-corpus results, new same-corpus results, and any external-domain result.
+- [x] Document install, anonymous data acquisition, smoke mode, training, evaluation, CLI prediction, and local demo commands literally.
+- [x] Document honest limitations: isolated still images, controlled-source bias, absent signer/session metadata, J/Z motion, no continuous signing/translation, and no validated accessibility deployment claim.
+- [x] Use neutral project voice; omit personal/class-project narrative and authorship claims.
+- [x] State that no project code license is provided unless contributor licensing is explicitly resolved.
+- [x] Use no filler badges.
+- [x] Follow the README exactly on a clean/simulated-fresh path and correct any mismatch.
+- [x] Update `SYNC.md` and review the documentation diff with a reviewer subagent.
 
 Acceptance criteria:
 
