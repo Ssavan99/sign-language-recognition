@@ -154,9 +154,9 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# Dataset folders
-Datasets/
-data/
+# Repository-local dataset folders
+/Datasets/
+/data/
 
 Objective2/Models/
 

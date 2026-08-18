@@ -27,9 +27,9 @@ Audit date: 2026-08-18
 - Checked-out branch: `revive/portfolio-ready-pipeline`
 - `main`: `06816f5bc03cc7dafa116525e1951280219f4747`
 - `origin/main`: `06816f5bc03cc7dafa116525e1951280219f4747`
-- Feature branch: `5db182147520c73209019b668a61344430a6dd06`
+- Preserved feature-branch base: `5db182147520c73209019b668a61344430a6dd06`
 - `origin/revive/portfolio-ready-pipeline`: `5db182147520c73209019b668a61344430a6dd06`
-- Feature-branch ahead/behind: `0/0`
+- The local feature branch contains new audit and curation commits that have not yet been pushed; the remote branch remains the verified preservation anchor.
 - No tags or stashes exist.
 
 ## Locally preserved history missing from `main`
@@ -59,10 +59,10 @@ The commits are now anchored unchanged on `revive/portfolio-ready-pipeline` at t
 
 ## Uncommitted and ignored work
 
-- Untracked: `Objective1/model-augmentation.ipynb` (1,038,589 bytes; last modified 2024-12-16).
-  - It is not identical to the later committed `Objective2/model_augmentation.ipynb`.
+- Preserved from formerly untracked work: `archive/notebooks/cnn_128_colab_incomplete.ipynb` (original blob hash `f6b251675be6288756d7cb2617461d01d2aea049`).
+  - It is not identical to the later committed augmented-CNN notebook.
   - It contains an incomplete 128x128 Colab/Google Drive experiment with no completed training result.
-  - It must not be silently discarded. The plan preserves it as clearly labeled historical work outside the supported path.
+  - It is now tracked and explicitly labeled unsupported in `archive/README.md`.
 - Ignored: `Datasets/` with 156,060 files totaling about 2.03 GB.
   - This includes 156,000 JPEGs and a roughly 1.02 GB archive.
   - It must remain untracked.
@@ -79,7 +79,7 @@ The commits are now anchored unchanged on `revive/portfolio-ready-pipeline` at t
   - `ASL Sign Language Analysis.pdf`: about 4.41 MB
   - data exploration notebook: about 1.88 MB
   - largest result PNG: about 0.79 MB
-- Tracked `.DS_Store` files exist in the later lineage and should be removed from the final tree while remaining in history.
+- The two tracked `.DS_Store` files were removed from the final tree in commit `8bdf05e` and remain recoverable in history. Root-anchored ignore coverage prevents their return.
 
 ## Preserved contributor metadata
 
@@ -108,4 +108,10 @@ This history will be preserved without rewriting authors, commit emails, merge t
 
 ## Sync conclusion
 
-The new origin is safely isolated. The checked-out feature branch begins exactly at the complete locally preserved lineage, is synchronized with the new origin, and retains all nine later commits without rewriting. The untracked notebook remains recoverable. Execution must keep the former repository untouched unless a separately approved visibility-only action occurs at the end.
+The new origin is safely isolated. The checked-out feature branch begins exactly at the complete locally preserved lineage, retains all nine later commits without rewriting, and now includes local audit/curation commits above that base. The formerly untracked notebook is committed in the archive and remains recoverable. Execution must keep the former repository untouched unless a separately approved visibility-only action occurs at the end.
+
+## Execution progress
+
+- Phase 1 passed independent preservation review. The full lineage is anchored at the new origin and no configured route to the former repository exists.
+- Phase 2 curation is complete after review fixes: all seven committed notebooks, the PDF, and six PNGs are exact renames; the incomplete local notebook is newly preserved under `archive/`; only `.DS_Store` metadata was removed; and both `/Datasets/` and `/data/` remain ignored.
+- The maintained package, evaluation artifacts, and demo do not exist yet. Documentation describes them as planned until their implementation phases pass review.

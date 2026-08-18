@@ -54,12 +54,12 @@ Acceptance criteria:
 
 ## Phase 2 - Curate the repository without erasing history
 
-- [ ] Remove tracked `.DS_Store` files from the final tree and add explicit ignore coverage.
-- [ ] Organize the historical report, result images, and original notebooks under clear `docs/`, `notebooks/`, and/or `archive/` paths.
-- [ ] Preserve the incomplete 128x128/Colab notebook under `archive/` with an explicit unsupported/incomplete label.
-- [ ] Keep substantive historical experiments accessible while excluding the broken transfer-learning result from the primary supported path.
-- [ ] Document the canonical data directory and ensure archives/extracted data remain ignored.
-- [ ] Update `SYNC.md` and review the phase diff with a reviewer subagent.
+- [x] Remove tracked `.DS_Store` files from the final tree and add explicit ignore coverage.
+- [x] Organize the historical report, result images, and original notebooks under clear `docs/`, `notebooks/`, and/or `archive/` paths.
+- [x] Preserve the incomplete 128x128/Colab notebook under `archive/` with an explicit unsupported/incomplete label.
+- [x] Keep substantive historical experiments accessible while excluding the broken transfer-learning result from the primary supported path.
+- [x] Document the canonical data directory and ensure archives/extracted data remain ignored.
+- [x] Update `SYNC.md` and review the phase diff with a reviewer subagent.
 
 Acceptance criteria:
 
