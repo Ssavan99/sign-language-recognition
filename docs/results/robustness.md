@@ -75,14 +75,15 @@ not then tried against the external set.
 
 ## Augmentation profiles
 
-All three share one inference contract — RGB, resized to 64x64, scaled to
+All four share one inference contract — RGB, resized to 64x64, scaled to
 [0, 1], ImageNet-normalised, no augmentation — so any of them produces a model
 that drops into the existing CLI, demo, and browser export unchanged.
 
 | Profile | Recipe |
 | --- | --- |
 | `baseline` | The released model's recipe, kept byte-for-byte as a control: mild resized crop, horizontal flip, 10° rotation, mild colour jitter. |
-| `robust` | Wider crops, affine jitter (20°, translate, scale, shear), strong colour jitter with hue, 30% random grayscale, and random erasing. Aimed at the colour, framing, and backdrop shortcuts the corpus makes available. |
+| `robust` | Wider crops, horizontal flip, affine jitter (20°, translate, scale, shear), strong colour jitter with hue, 30% random grayscale, and random erasing. Aimed at the colour, framing, and backdrop shortcuts the corpus makes available. |
+| `robust_noflip` | Identical to `robust` with horizontal flip removed. Flipping is inherited from the released recipe but is questionable for fingerspelling: it maps a sign to its opposite-handed form, and for asymmetric letters that is a different shape rather than the same shape seen again. |
 | `trivialaugment` | Resized crop, horizontal flip, torchvision's parameter-free `TrivialAugmentWide`, and random erasing. Included so the comparison is not purely between recipes hand-tuned by the same author. |
 
 ## Results

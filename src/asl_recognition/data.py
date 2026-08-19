@@ -768,7 +768,12 @@ def verify_manifest_files(
 # profile shares one inference contract (RGB, resized to image_size, scaled to
 # [0, 1], ImageNet-normalised, no augmentation), so a model trained under any of
 # them drops into the existing CLI, demo, and browser export unchanged.
-AUGMENTATION_PROFILES: tuple[str, ...] = ("baseline", "robust", "trivialaugment")
+AUGMENTATION_PROFILES: tuple[str, ...] = (
+    "baseline",
+    "robust",
+    "robust_noflip",
+    "trivialaugment",
+)
 
 DEFAULT_AUGMENTATION_PROFILE = "baseline"
 
@@ -788,15 +793,23 @@ def _profile_transforms(profile: str, image_size: int, transforms: Any) -> tuple
             ],
             [],
         )
-    if profile == "robust":
+    if profile in {"robust", "robust_noflip"}:
         # Aimed squarely at the observed failure: the corpus is one controlled
         # capture setup, so the model can lean on colour, framing, and backdrop.
         # Wider crops, affine jitter, and random grayscale attack exactly those
         # shortcuts; erasing discourages betting everything on one image region.
+        #
+        # The two variants differ only in horizontal flip. Flipping is inherited
+        # from the released recipe but is questionable for fingerspelling: it
+        # maps a sign to its opposite-handed form, and for asymmetric letters
+        # that is a different shape rather than the same shape seen again. Both
+        # are screened because the primary corpus is single-handed while the
+        # external source's handedness is not recorded either way.
+        flip = [transforms.RandomHorizontalFlip(p=0.5)] if profile == "robust" else []
         return (
             [
                 transforms.RandomResizedCrop(image_size, scale=(0.45, 1.0), ratio=(0.75, 1.33)),
-                transforms.RandomHorizontalFlip(p=0.5),
+                *flip,
                 transforms.RandomAffine(
                     degrees=20,
                     translate=(0.15, 0.15),
