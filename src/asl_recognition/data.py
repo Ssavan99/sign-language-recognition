@@ -712,20 +712,21 @@ def _resolve_manifest_image(source_root: Path, relative_path: str) -> Path:
     return candidate
 
 
-def verify_manifest_files(
-    manifest_path: Path,
+def verify_manifest_rows(
+    rows: Sequence[dict[str, str]],
     source_root: Path,
     expected_split: str | None = None,
 ) -> list[dict[str, str]]:
-    """Verify manifest identity against source files before a model consumes it.
+    """Verify already-parsed manifest rows against the bytes on disk.
 
-    Verification is intentionally performed once before a training or evaluation
-    run rather than on every batch. This keeps data loading inexpensive while
-    ensuring the recorded manifest still describes the bytes on disk.
+    Splitting this out from :func:`verify_manifest_files` lets a caller that
+    consumes only part of a manifest -- a stratified screening subset, say --
+    checksum exactly the rows it will read. That is a narrower verification
+    scope, never a weaker one: every consumed row is still hashed and compared.
     """
 
     root = _require_directory(Path(source_root), "Dataset source root")
-    rows = read_manifest(Path(manifest_path))
+    rows = list(rows)
     seen_paths: set[Path] = set()
     for line_number, row in enumerate(rows, start=2):
         candidate = _resolve_manifest_image(root, row["path"])
@@ -748,13 +749,102 @@ def verify_manifest_files(
     return rows
 
 
-def build_transforms(image_size: int, training: bool):
-    """Build augmentation-only training or deterministic evaluation transforms."""
+def verify_manifest_files(
+    manifest_path: Path,
+    source_root: Path,
+    expected_split: str | None = None,
+) -> list[dict[str, str]]:
+    """Verify manifest identity against source files before a model consumes it.
+
+    Verification is intentionally performed once before a training or evaluation
+    run rather than on every batch. This keeps data loading inexpensive while
+    ensuring the recorded manifest still describes the bytes on disk.
+    """
+
+    return verify_manifest_rows(read_manifest(Path(manifest_path)), source_root, expected_split)
+
+
+# Named training-augmentation recipes. Only the training path varies: every
+# profile shares one inference contract (RGB, resized to image_size, scaled to
+# [0, 1], ImageNet-normalised, no augmentation), so a model trained under any of
+# them drops into the existing CLI, demo, and browser export unchanged.
+AUGMENTATION_PROFILES: tuple[str, ...] = ("baseline", "robust", "trivialaugment")
+
+DEFAULT_AUGMENTATION_PROFILE = "baseline"
+
+
+def _profile_transforms(profile: str, image_size: int, transforms: Any) -> tuple[list, list]:
+    """Return the pre-tensor and post-tensor stages for a training profile."""
+
+    if profile == "baseline":
+        # The recipe the released model was trained with. Kept byte-for-byte so
+        # "baseline" is a genuine control, not an approximation of one.
+        return (
+            [
+                transforms.RandomResizedCrop(image_size, scale=(0.8, 1.0), ratio=(0.9, 1.1)),
+                transforms.RandomHorizontalFlip(p=0.5),
+                transforms.RandomRotation(degrees=10),
+                transforms.ColorJitter(brightness=0.15, contrast=0.15, saturation=0.10),
+            ],
+            [],
+        )
+    if profile == "robust":
+        # Aimed squarely at the observed failure: the corpus is one controlled
+        # capture setup, so the model can lean on colour, framing, and backdrop.
+        # Wider crops, affine jitter, and random grayscale attack exactly those
+        # shortcuts; erasing discourages betting everything on one image region.
+        return (
+            [
+                transforms.RandomResizedCrop(image_size, scale=(0.45, 1.0), ratio=(0.75, 1.33)),
+                transforms.RandomHorizontalFlip(p=0.5),
+                transforms.RandomAffine(
+                    degrees=20,
+                    translate=(0.15, 0.15),
+                    scale=(0.8, 1.25),
+                    shear=10,
+                ),
+                transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.4, hue=0.08),
+                transforms.RandomGrayscale(p=0.30),
+            ],
+            [transforms.RandomErasing(p=0.25, scale=(0.02, 0.15))],
+        )
+    if profile == "trivialaugment":
+        # A parameter-free published policy, included so the comparison is not
+        # purely between hand-tuned recipes chosen by the same author.
+        return (
+            [
+                transforms.RandomResizedCrop(image_size, scale=(0.5, 1.0), ratio=(0.75, 1.33)),
+                transforms.RandomHorizontalFlip(p=0.5),
+                transforms.TrivialAugmentWide(),
+            ],
+            [transforms.RandomErasing(p=0.25, scale=(0.02, 0.15))],
+        )
+    raise ValueError(
+        f"unknown augmentation profile {profile!r}; expected one of {list(AUGMENTATION_PROFILES)}"
+    )
+
+
+def build_transforms(
+    image_size: int,
+    training: bool,
+    profile: str = DEFAULT_AUGMENTATION_PROFILE,
+):
+    """Build augmentation-only training or deterministic evaluation transforms.
+
+    ``profile`` selects a training-augmentation recipe and is ignored when
+    ``training`` is false: validation, test, external, and inference
+    preprocessing are identical under every profile by design.
+    """
 
     if isinstance(image_size, bool) or not isinstance(image_size, int) or image_size <= 0:
         raise ValueError("image_size must be a positive integer")
     if not isinstance(training, bool):
         raise TypeError("training must be a boolean")
+    if profile not in AUGMENTATION_PROFILES:
+        raise ValueError(
+            f"unknown augmentation profile {profile!r}; "
+            f"expected one of {list(AUGMENTATION_PROFILES)}"
+        )
     try:
         from torchvision import transforms
     except ImportError as exc:  # pragma: no cover - depends on optional environment
@@ -763,19 +853,15 @@ def build_transforms(image_size: int, training: bool):
         ) from exc
 
     if training:
-        spatial = [
-            transforms.RandomResizedCrop(image_size, scale=(0.8, 1.0), ratio=(0.9, 1.1)),
-            transforms.RandomHorizontalFlip(p=0.5),
-            transforms.RandomRotation(degrees=10),
-            transforms.ColorJitter(brightness=0.15, contrast=0.15, saturation=0.10),
-        ]
+        spatial, post_tensor = _profile_transforms(profile, image_size, transforms)
     else:
-        spatial = [transforms.Resize((image_size, image_size))]
+        spatial, post_tensor = [transforms.Resize((image_size, image_size))], []
     return transforms.Compose(
         [
             *spatial,
             transforms.ToTensor(),
             transforms.Normalize(mean=IMAGE_MEAN, std=IMAGE_STD),
+            *post_tensor,
         ]
     )
 
@@ -787,11 +873,30 @@ class ManifestImageDataset:
     at module import time. PyTorch's DataLoader accepts this map-style protocol.
     """
 
-    def __init__(self, manifest_path: Path, source_root: Path, transform: Any) -> None:
+    def __init__(
+        self,
+        manifest_path: Path,
+        source_root: Path,
+        transform: Any,
+        rows: Sequence[dict[str, str]] | None = None,
+    ) -> None:
         self.manifest_path = Path(manifest_path).expanduser().resolve()
         self.source_root = _require_directory(Path(source_root), "Dataset source root")
         self.transform = transform
-        self.rows = read_manifest(self.manifest_path)
+        # A caller that has already verified this manifest can hand its rows
+        # over instead of paying for a second parse and a second copy. On the
+        # full training split that duplicate read cost about 42 MB of resident
+        # memory for no benefit.
+        if rows is None:
+            self.rows = read_manifest(self.manifest_path)
+        else:
+            self.rows = list(rows)
+            for index, row in enumerate(self.rows):
+                missing = [field for field in MANIFEST_FIELDS if not row.get(field)]
+                if missing:
+                    raise ValueError(f"Supplied manifest row {index} is missing {missing}")
+                if row["label"] not in CLASS_NAMES:
+                    raise ValueError(f"Supplied manifest row {index} has label {row['label']!r}")
         if not self.rows:
             raise ValueError(f"Manifest contains no samples: {self.manifest_path}")
 

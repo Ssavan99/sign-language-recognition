@@ -8,6 +8,9 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from .data import AUGMENTATION_PROFILES, DEFAULT_AUGMENTATION_PROFILE
+from .resources import DEFAULT_MINIMUM_AVAILABLE_BYTES
+
 
 def _path(value: str) -> Path:
     return Path(value).expanduser().resolve()
@@ -75,6 +78,34 @@ def build_parser() -> argparse.ArgumentParser:
     train.add_argument("--num-workers", type=int, default=0)
     train.add_argument("--patience", type=int, default=3)
     train.add_argument("--limit-per-split", type=int)
+    train.add_argument(
+        "--limit-per-class",
+        type=int,
+        help="Train on this many evenly spaced images per class (screening runs).",
+    )
+    train.add_argument(
+        "--minimum-available-gib",
+        type=float,
+        default=DEFAULT_MINIMUM_AVAILABLE_BYTES / 1024**3,
+        help="Refuse to start below this much available host memory.",
+    )
+    train.add_argument(
+        "--allow-low-memory",
+        action="store_true",
+        help="Start even when the host is below the memory floor.",
+    )
+    train.add_argument(
+        "--augmentation-profile",
+        choices=AUGMENTATION_PROFILES,
+        default=DEFAULT_AUGMENTATION_PROFILE,
+        help="Training-augmentation recipe. Inference preprocessing is unaffected.",
+    )
+    train.add_argument(
+        "--select-on",
+        choices=("validation", "stress"),
+        default="validation",
+        help="Metric used to pick the best epoch. Both are always recorded.",
+    )
     _add_device_argument(train)
     train.set_defaults(handler=_train)
 
@@ -203,6 +234,11 @@ def _train(args: argparse.Namespace) -> dict:
         device=args.device,
         patience=args.patience,
         limit_per_split=args.limit_per_split,
+        limit_per_class=args.limit_per_class,
+        minimum_available_bytes=int(args.minimum_available_gib * 1024**3),
+        allow_low_memory=args.allow_low_memory,
+        augmentation_profile=args.augmentation_profile,
+        select_on=args.select_on,
     )
     _print_result(result)
     return result
