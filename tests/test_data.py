@@ -194,3 +194,22 @@ def test_invalid_split_ratios_are_rejected(
             validation_ratio=ratios[1],
             test_ratio=ratios[2],
         )
+
+
+def test_read_manifest_rejects_a_duplicate_path_anywhere_in_the_file(
+    tmp_path: Path,
+    prepared_data: tuple[Path, Path, dict],
+) -> None:
+    source, manifests, _ = prepared_data
+    rows = read_manifest(manifests / "train.csv")
+    duplicated = tmp_path / "duplicated.csv"
+    with duplicated.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=MANIFEST_FIELDS, lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(rows)
+        writer.writerow(rows[0])
+
+    # The check must live at parse time: a caller that verifies only a subset of
+    # rows would otherwise never see a duplicate outside that subset.
+    with pytest.raises(ValueError, match="Duplicate path on manifest line"):
+        read_manifest(duplicated)

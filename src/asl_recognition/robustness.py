@@ -26,6 +26,7 @@ remains the only arbiter of whether a model actually transfers.
 
 from __future__ import annotations
 
+import hashlib
 import io
 from collections.abc import Callable, Sequence
 from typing import Any
@@ -155,16 +156,27 @@ def apply_corruption(image: Any, name: str, seed: int = 0) -> Any:
     raise KeyError(f"unknown corruption: {name!r}; expected one of {list(CORRUPTION_NAMES)}")
 
 
-def benchmark_definition() -> dict[str, Any]:
-    """Describe the frozen benchmark for run metadata."""
+def benchmark_definition(dataset: StressDataset | None = None) -> dict[str, Any]:
+    """Describe the frozen benchmark for run metadata.
 
-    return {
+    The version string alone does not identify a measurement. The benchmark is
+    built from whatever validation rows a run consumes, so a subset-limited
+    screening run and a full-split run share a version yet score entirely
+    different image sets. Passing the dataset records a digest over the exact
+    scored rows, which is what makes two stress numbers comparable or not.
+    """
+
+    definition: dict[str, Any] = {
         "version": STRESS_BENCHMARK_VERSION,
         "corruptions": list(CORRUPTION_NAMES),
         "independent_corruptions": sorted(INDEPENDENT_CORRUPTIONS),
         "assignment": "row position modulo corruption count",
         "source": "source validation split only",
     }
+    if dataset is not None:
+        definition["row_count"] = len(dataset)
+        definition["row_digest"] = dataset.row_digest()
+    return definition
 
 
 class StressDataset:
@@ -183,14 +195,30 @@ class StressDataset:
         source_root: Any,
         transform: Any,
     ) -> None:
-        from .data import _require_directory
+        from .data import _require_directory, validate_manifest_rows
 
-        self.rows = list(rows)
+        self.rows = validate_manifest_rows(rows)
         if not self.rows:
             raise ValueError("stress benchmark requires at least one validation row")
+        if len(self.rows) < len(CORRUPTION_NAMES):
+            # Corruptions are assigned by position, so a row set smaller than the
+            # corruption count leaves some corruptions unscored and makes the
+            # per-corruption breakdown incomparable between runs.
+            raise ValueError(
+                f"stress benchmark needs at least {len(CORRUPTION_NAMES)} rows to cover "
+                f"every corruption, got {len(self.rows)}"
+            )
         self.source_root = _require_directory(source_root, "Dataset source root")
         self.transform = transform
         self.corruptions = [corruption_for_index(index) for index in range(len(self.rows))]
+
+    def row_digest(self) -> str:
+        """Digest the exact scored rows, so two stress scores can be compared safely."""
+
+        digest = hashlib.sha256()
+        for row, corruption in zip(self.rows, self.corruptions, strict=True):
+            digest.update(f"{row['path']}\x00{row['sha256']}\x00{corruption}\n".encode())
+        return digest.hexdigest()
 
     def __len__(self) -> int:
         return len(self.rows)

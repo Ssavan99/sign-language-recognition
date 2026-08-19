@@ -159,3 +159,59 @@ def test_stress_dataset_requires_rows(prepared_data: tuple[Path, Path, dict]) ->
     source, _, _ = prepared_data
     with pytest.raises(ValueError, match="at least one validation row"):
         StressDataset([], source, build_transforms(32, training=False))
+
+
+def test_stress_benchmark_identity_includes_the_scored_rows(
+    prepared_data: tuple[Path, Path, dict],
+) -> None:
+    source, manifests, _ = prepared_data
+    rows = verify_manifest_files(manifests / "validation.csv", source, "validation")
+    transform = build_transforms(32, training=False)
+
+    full = StressDataset(rows, source, transform)
+    subset = StressDataset(rows[:-1], source, transform)
+
+    # A shared version string must not imply comparability: the benchmark scores
+    # whatever rows a run consumed.
+    assert full.row_digest() != subset.row_digest()
+    assert benchmark_definition(full)["row_digest"] == full.row_digest()
+    assert benchmark_definition(full)["row_count"] == len(rows)
+    assert benchmark_definition(full)["version"] == benchmark_definition(subset)["version"]
+    assert "row_digest" not in benchmark_definition()
+
+
+def test_stress_row_digest_is_stable_across_instances(
+    prepared_data: tuple[Path, Path, dict],
+) -> None:
+    source, manifests, _ = prepared_data
+    rows = verify_manifest_files(manifests / "validation.csv", source, "validation")
+    transform = build_transforms(32, training=False)
+
+    assert (
+        StressDataset(rows, source, transform).row_digest()
+        == StressDataset(list(rows), source, transform).row_digest()
+    )
+
+
+def test_stress_dataset_rejects_a_row_set_too_small_to_cover_every_corruption(
+    prepared_data: tuple[Path, Path, dict],
+) -> None:
+    source, manifests, _ = prepared_data
+    rows = verify_manifest_files(manifests / "validation.csv", source, "validation")
+
+    with pytest.raises(ValueError, match="at least 8 rows"):
+        StressDataset(rows[:5], source, build_transforms(32, training=False))
+
+
+def test_stress_dataset_validates_supplied_rows(
+    prepared_data: tuple[Path, Path, dict],
+) -> None:
+    source, manifests, _ = prepared_data
+    rows = [
+        dict(row)
+        for row in verify_manifest_files(manifests / "validation.csv", source, "validation")
+    ]
+    rows[0]["sha256"] = "not-a-digest"
+
+    with pytest.raises(ValueError, match="invalid SHA-256"):
+        StressDataset(rows, source, build_transforms(32, training=False))

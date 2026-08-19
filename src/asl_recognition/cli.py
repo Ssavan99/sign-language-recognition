@@ -77,7 +77,12 @@ def build_parser() -> argparse.ArgumentParser:
     train.add_argument("--seed", type=int, default=42)
     train.add_argument("--num-workers", type=int, default=0)
     train.add_argument("--patience", type=int, default=3)
-    train.add_argument("--limit-per-split", type=int)
+    train.add_argument(
+        "--limit-per-split",
+        type=int,
+        help="Deprecated. Superseded by --limit-per-class, which also bounds the "
+        "stress benchmark and subsets before checksum verification.",
+    )
     train.add_argument(
         "--limit-per-class",
         type=int,

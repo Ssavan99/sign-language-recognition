@@ -682,6 +682,12 @@ def read_manifest(path: Path) -> list[dict[str, str]]:
         rows = list(reader)
 
     allowed_splits = {"train", "validation", "test", "external"}
+    # Duplicate paths are checked here, over the complete file, rather than
+    # during file verification. A caller may verify only the subset of rows it
+    # consumes, and a duplicate that lands outside that subset would then go
+    # unnoticed -- so the whole-manifest invariant belongs with the whole-manifest
+    # parse.
+    seen_relative_paths: set[str] = set()
     for line_number, row in enumerate(rows, start=2):
         if any(row.get(field) in {None, ""} for field in MANIFEST_FIELDS):
             raise ValueError(f"Manifest line {line_number} has a missing or empty field")
@@ -700,6 +706,9 @@ def read_manifest(path: Path) -> list[dict[str, str]]:
             raise ValueError(f"Invalid SHA-256 on manifest line {line_number}")
         if len(row["dhash"]) != 16 or any(char not in "0123456789abcdef" for char in row["dhash"]):
             raise ValueError(f"Invalid dHash on manifest line {line_number}")
+        if row["path"] in seen_relative_paths:
+            raise ValueError(f"Duplicate path on manifest line {line_number}: {row['path']}")
+        seen_relative_paths.add(row["path"])
     return rows
 
 
@@ -712,6 +721,36 @@ def _resolve_manifest_image(source_root: Path, relative_path: str) -> Path:
     return candidate
 
 
+def validate_manifest_rows(rows: Sequence[dict[str, str]]) -> list[dict[str, str]]:
+    """Apply the manifest row contract to rows that did not come from a CSV parse.
+
+    :func:`read_manifest` enforces this contract while parsing. Callers that
+    hand rows directly to a dataset bypass that parse, so the same checks are
+    applied here rather than trusting the caller.
+    """
+
+    checked: list[dict[str, str]] = []
+    for index, row in enumerate(rows):
+        missing = [field for field in MANIFEST_FIELDS if not row.get(field)]
+        if missing:
+            raise ValueError(f"Supplied manifest row {index} is missing {missing}")
+        relative = PurePosixPath(row["path"])
+        if relative.is_absolute() or ".." in relative.parts or "\\" in row["path"]:
+            raise ValueError(f"Supplied manifest row {index} has an unsafe path: {row['path']}")
+        if relative.as_posix() != row["path"]:
+            raise ValueError(f"Supplied manifest row {index} has a non-canonical path")
+        if row["label"] not in CLASS_NAMES:
+            raise ValueError(f"Supplied manifest row {index} has label {row['label']!r}")
+        if len(row["sha256"]) != 64 or any(
+            char not in "0123456789abcdef" for char in row["sha256"]
+        ):
+            raise ValueError(f"Supplied manifest row {index} has an invalid SHA-256")
+        if len(row["dhash"]) != 16 or any(char not in "0123456789abcdef" for char in row["dhash"]):
+            raise ValueError(f"Supplied manifest row {index} has an invalid dHash")
+        checked.append(row)
+    return checked
+
+
 def verify_manifest_rows(
     rows: Sequence[dict[str, str]],
     source_root: Path,
@@ -721,22 +760,25 @@ def verify_manifest_rows(
 
     Splitting this out from :func:`verify_manifest_files` lets a caller that
     consumes only part of a manifest -- a stratified screening subset, say --
-    checksum exactly the rows it will read. That is a narrower verification
-    scope, never a weaker one: every consumed row is still hashed and compared.
+    checksum exactly the rows it will read. Every consumed row is still hashed
+    and compared. The whole-manifest invariants that a subset cannot see, such
+    as duplicate paths, are enforced by :func:`read_manifest` at parse time.
+
+    Rows here may be a subset in any order, so failures identify the offending
+    image by path. A position in this sequence is not a manifest line number.
     """
 
     root = _require_directory(Path(source_root), "Dataset source root")
     rows = list(rows)
     seen_paths: set[Path] = set()
-    for line_number, row in enumerate(rows, start=2):
+    for row in rows:
         candidate = _resolve_manifest_image(root, row["path"])
         if candidate in seen_paths:
-            raise ValueError(f"Duplicate path on manifest line {line_number}: {row['path']}")
+            raise ValueError(f"Duplicate path among supplied rows: {row['path']}")
         seen_paths.add(candidate)
         if expected_split is not None and row["split"] != expected_split:
             raise ValueError(
-                f"Expected split {expected_split!r} on manifest line {line_number}, "
-                f"got {row['split']!r}"
+                f"Expected split {expected_split!r} for {row['path']}, got {row['split']!r}"
             )
         if not candidate.is_file():
             raise FileNotFoundError(f"Manifest image does not exist: {candidate}")
@@ -903,13 +945,7 @@ class ManifestImageDataset:
         if rows is None:
             self.rows = read_manifest(self.manifest_path)
         else:
-            self.rows = list(rows)
-            for index, row in enumerate(self.rows):
-                missing = [field for field in MANIFEST_FIELDS if not row.get(field)]
-                if missing:
-                    raise ValueError(f"Supplied manifest row {index} is missing {missing}")
-                if row["label"] not in CLASS_NAMES:
-                    raise ValueError(f"Supplied manifest row {index} has label {row['label']!r}")
+            self.rows = validate_manifest_rows(rows)
         if not self.rows:
             raise ValueError(f"Manifest contains no samples: {self.manifest_path}")
 

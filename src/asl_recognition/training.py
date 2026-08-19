@@ -18,7 +18,7 @@ import numpy as np
 import torch
 from torch import nn
 from torch.optim import AdamW
-from torch.utils.data import DataLoader, Dataset, Subset
+from torch.utils.data import DataLoader
 
 from .constants import CLASS_NAMES
 from .data import (
@@ -132,31 +132,36 @@ def _stratified_indices(rows: Sequence[dict[str, str]], per_class: int) -> list[
     return sorted(set(selected))
 
 
-def _limited(dataset: Dataset[Any], limit: int | None) -> Dataset[Any]:
+def _limited_rows(rows: Sequence[dict[str, str]], limit: int | None) -> list[dict[str, str]]:
+    """Cap a split at a total row count, round-robin across classes.
+
+    Applied to the records rather than to a wrapped dataset so that every
+    consumer -- training, validation, and the stress benchmark -- sees the same
+    subset, and so the rows are known before checksum verification runs.
+    """
+
     if limit is None:
-        return dataset
+        return list(rows)
     if limit <= 0:
         raise ValueError("limit_per_split must be positive")
-    target = min(limit, len(dataset))
-    rows = getattr(dataset, "rows", None)
-    if isinstance(rows, list) and all(isinstance(row, dict) for row in rows):
-        by_label = {
-            label: [index for index, row in enumerate(rows) if row.get("label") == label]
-            for label in CLASS_NAMES
-        }
-        indices: list[int] = []
-        offset = 0
-        while len(indices) < target:
-            added = False
-            for label in CLASS_NAMES:
-                if offset < len(by_label[label]) and len(indices) < target:
-                    indices.append(by_label[label][offset])
-                    added = True
-            if not added:
-                break
-            offset += 1
-        return Subset(dataset, indices)
-    return Subset(dataset, range(target))
+    target = min(limit, len(rows))
+    by_label: dict[str, list[int]] = {label: [] for label in CLASS_NAMES}
+    for index, row in enumerate(rows):
+        bucket = by_label.get(str(row.get("label")))
+        if bucket is not None:
+            bucket.append(index)
+    indices: list[int] = []
+    offset = 0
+    while len(indices) < target:
+        added = False
+        for label in CLASS_NAMES:
+            if offset < len(by_label[label]) and len(indices) < target:
+                indices.append(by_label[label][offset])
+                added = True
+        if not added:
+            break
+        offset += 1
+    return [rows[index] for index in sorted(indices)]
 
 
 def _unpack_batch(batch: Any) -> tuple[torch.Tensor, torch.Tensor]:
@@ -361,6 +366,9 @@ def train_model(
             validation_records[index]
             for index in _stratified_indices(validation_records, limit_per_class)
         ]
+    elif limit_per_split is not None:
+        train_records = _limited_rows(train_records, limit_per_split)
+        validation_records = _limited_rows(validation_records, limit_per_split)
 
     # Checksum-verify the rows this run will actually read. The cross-split
     # overlap check above already used the complete manifests, so narrowing the
@@ -371,23 +379,17 @@ def train_model(
 
     # The records were parsed and checksum-verified above; handing them straight
     # to the datasets avoids a second parse of the same two files.
-    train_dataset = _limited(
-        ManifestImageDataset(
-            train_manifest,
-            source_root,
-            build_transforms(image_size, training=True, profile=augmentation_profile),
-            rows=train_records,
-        ),
-        limit_per_split,
+    train_dataset = ManifestImageDataset(
+        train_manifest,
+        source_root,
+        build_transforms(image_size, training=True, profile=augmentation_profile),
+        rows=train_records,
     )
-    validation_dataset = _limited(
-        ManifestImageDataset(
-            validation_manifest,
-            source_root,
-            build_transforms(image_size, training=False),
-            rows=validation_records,
-        ),
-        limit_per_split,
+    validation_dataset = ManifestImageDataset(
+        validation_manifest,
+        source_root,
+        build_transforms(image_size, training=False),
+        rows=validation_records,
     )
     # The stress benchmark reuses the validation rows that were just verified, so
     # it never reads an image the run has not already checksummed.
@@ -396,6 +398,9 @@ def train_model(
         source_root,
         build_transforms(image_size, training=False),
     )
+    # Each dataset took its own shallow copy, so this releases the list objects
+    # rather than the row dicts. The set deletion above is the one that actually
+    # reclaims memory.
     del train_records, validation_records
     generator = torch.Generator().manual_seed(seed)
     loader_options = {
@@ -408,9 +413,18 @@ def train_model(
         "generator": generator,
         "persistent_workers": num_workers > 0,
     }
+    # Only the training loader gets worker processes. The two inference passes are
+    # comparatively cheap, and three persistent worker pools would spend memory
+    # the preflight above already promised was available.
+    eval_loader_options = {
+        **loader_options,
+        "num_workers": 0,
+        "worker_init_fn": None,
+        "persistent_workers": False,
+    }
     train_loader = DataLoader(train_dataset, shuffle=True, **loader_options)
-    validation_loader = DataLoader(validation_dataset, shuffle=False, **loader_options)
-    stress_loader = DataLoader(stress_dataset, shuffle=False, **loader_options)
+    validation_loader = DataLoader(validation_dataset, shuffle=False, **eval_loader_options)
+    stress_loader = DataLoader(stress_dataset, shuffle=False, **eval_loader_options)
 
     model = build_model(num_classes=len(CLASS_NAMES)).to(selected_device)
     optimizer = AdamW(model.parameters(), lr=learning_rate, weight_decay=1e-4)
@@ -508,7 +522,7 @@ def train_model(
                         "selection_loss": best_selection_loss,
                         "stress_loss": best_stress_loss,
                         "stress_accuracy": stress_accuracy,
-                        "stress_benchmark": benchmark_definition(),
+                        "stress_benchmark": benchmark_definition(stress_dataset),
                     },
                 },
             )
@@ -528,7 +542,7 @@ def train_model(
         "best_stress_loss": best_stress_loss,
         "select_on": select_on,
         "augmentation_profile": augmentation_profile,
-        "stress_benchmark": benchmark_definition(),
+        "stress_benchmark": benchmark_definition(stress_dataset),
         "epochs_completed": len(epoch_history),
         "stopped_early": stopped_early,
         "duration_seconds": duration_seconds,
@@ -564,7 +578,7 @@ def train_model(
         },
         "augmentation_profile": augmentation_profile,
         "select_on": select_on,
-        "stress_benchmark": benchmark_definition(),
+        "stress_benchmark": benchmark_definition(stress_dataset),
         "class_names": list(CLASS_NAMES),
         "parameter_count": count_parameters(model),
         "checkpoint_path": str(checkpoint_path.resolve()),
