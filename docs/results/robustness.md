@@ -239,3 +239,53 @@ distances, and cameras -- rather than more of the same kind of data.
 The supplementary-corpus pipeline is retained in the repository because the
 experiment is reproducible from it, and because a genuinely diverse source could
 be dropped into the same path unchanged.
+
+## Probe: does detect-then-crop fix the camera case? (partly, not enough)
+
+The classifier is trained on a hand filling a tight frame. A camera frame, and
+the external set, put a smaller hand inside a wider scene. That is a framing
+mismatch as much as a robustness problem, so the cheapest possible correction is
+to detect the hand, crop to it, and classify the crop with the unchanged model.
+
+### Protecting the measurement first
+
+The external set had already been scored twice. Before running anything else
+against it, `tools/split_external_holdout.py` divided it once into a 390-image
+**dev** half and a 390-image **final** half -- stratified by class, fixed seed,
+row digests recorded in `external-split.json`. Experiments iterate on dev. The
+final half is scored at most once per published model. Without that, repeated
+consultation would quietly turn the project's only blind test into a validation
+set.
+
+### Result on the dev half
+
+Detection used the same public MediaPipe HandLandmarker task file the website
+loads. The model was not retrained or modified.
+
+| Configuration | Correct | Accuracy |
+| --- | ---: | ---: |
+| Full frame (baseline) | 116 / 390 | 29.74% |
+| Crop, 10% padding | 136 / 390 | 34.87% |
+| Crop, 30% padding | 136 / 390 | 34.87% |
+| Crop, 60% padding | 139 / 390 | **35.64%** |
+
+A hand was found in **95.64%** of dev images, so detection is not the
+bottleneck. Measured only over images where a hand was found, the best crop
+reaches 37.27% -- that is the ceiling this approach has even with perfect
+detection.
+
+### What it means
+
+Cropping is worth about **+6 points**, real but far short of the 50-60% a usable
+camera demo would need. Framing was part of the problem, not the whole of it.
+Once the hand is cropped, the model is still judging *appearance* -- lighting,
+skin tone, and whatever background survives inside the crop -- and that is still
+unlike its training corpus.
+
+The 95.64% detection rate is the more useful number. It says landmarks are
+reliably available on this kind of imagery, and landmark coordinates discard
+appearance entirely rather than merely re-framing it. That is the approach with
+a plausible path to 50-60%; cropping pixels is not.
+
+Both padding values at 0.1 and 0.3 scoring 136 is a coincidence of totals, not a
+bug: the crops were verified to differ on every sampled image.
