@@ -8,9 +8,9 @@ evaluation, command-line inference, and an optional local demo.
 
 ![Local classifier showing a confident domain-shift failure](docs/demo/demo-screenshot.png)
 
-The screenshot shows the released model predicting **N** at 75.9% confidence for an external
-sample whose true label is **A**. This failure is intentional evidence: the model reaches 99.82%
-accuracy on its same-corpus source test partition but only 17.56% on a separate capture source.
+The screenshot shows the released model predicting **L** at 76.2% confidence for an external
+sample whose true label is **A**. This failure is intentional evidence: the model reaches 98.92%
+accuracy on its same-corpus source test partition but only 31.67% on a separate capture source.
 The project is therefore an isolated-image experiment, not a real-world signing or accessibility
 system.
 
@@ -34,16 +34,26 @@ system.
 | Experiment | Evaluation scope | Images | Accuracy | Macro F1 |
 | --- | --- | ---: | ---: | ---: |
 | Historical reported CNN | Same-corpus image holdout; unseeded historical workflow | Not retained in a manifest | 94.27% | Not reported |
-| Maintained compact CNN | Untouched test partition from the training corpus | 15,600 | 99.82% | 99.82% |
-| Maintained compact CNN | Separate external capture source | 780 | 17.56% | 16.82% |
+| Previous compact CNN | Untouched test partition from the training corpus | 15,600 | 99.82% | 99.82% |
+| Previous compact CNN | Separate external capture source | 780 | 17.56% | 16.82% |
+| Maintained compact CNN | Untouched test partition from the training corpus | 15,600 | 98.92% | 98.93% |
+| Maintained compact CNN | Separate external capture source | 780 | **31.67%** | 31.74% |
 
 The maintained model classified 15,572 of 15,600 internal test images correctly, but only 137 of
-780 external images. The 82.26 percentage-point gap is evidence of severe capture-domain bias.
+780 external images. The 67.25 percentage-point gap is evidence of severe capture-domain bias.
+
+External accuracy nearly doubled, from 17.56% to 31.67%, for a 0.90-point cost on the same-corpus
+test. The gain came from changing the training-augmentation recipe alone; architecture, image size,
+seed, optimizer, and the inference preprocessing contract are unchanged. The experiment, its
+pre-registered decision rule, and the candidates that lost are documented in
+[docs/results/robustness.md](docs/results/robustness.md). Two of every three external images are
+still classified incorrectly, so this remains a demonstration of domain shift, not a deployable
+system.
 Internal performance must not be interpreted as signer-independent or real-world accuracy.
 
 The released checkpoint uses 64 x 64 RGB inputs, three convolutional blocks, AdamW, seed 42, and
 12 CPU training epochs. Its SHA-256 is
-`8b3d071082615de4a21a6303c8e9ca5496a747c6f5707064f26b3d6a9f6c40a7`.
+`ea9208df33b76843ac24eac2188dcce809da3e609629914e99024eb14ba7727e`.
 See the [current result report](docs/results/current/README.md), [model card](models/README.md), and
 [historical archive](archive/README.md) for the full evidence and comparability boundaries. The
 broken two-class transfer-learning notebook's near-perfect metric is excluded from supported
@@ -167,19 +177,19 @@ The repository includes the evaluated compact checkpoint and a CC0 external samp
 
 ```powershell
 asl-recognition predict docs/demo/sample_external_a.jpg `
-  --checkpoint models/asl_alphabet_cnn_seed42.pt `
+  --checkpoint models/asl_alphabet_cnn_robust_seed42.pt `
   --top-k 3 `
   --device cpu
 ```
 
-The deterministic sample result is N at approximately 75.9% confidence, despite its true A label.
+The deterministic sample result is L at approximately 76.2% confidence, despite its true A label.
 
 ## Local demo
 
 Launch the optional upload/webcam interface on the loopback address:
 
 ```powershell
-asl-recognition demo --checkpoint models/asl_alphabet_cnn_seed42.pt --device cpu
+asl-recognition demo --checkpoint models/asl_alphabet_cnn_robust_seed42.pt --device cpu
 ```
 
 Open the printed local URL. Public sharing and public prediction APIs are disabled. The built-in

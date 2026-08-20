@@ -118,6 +118,23 @@ Summarise a set of screening runs with:
 python tools/summarize_screening.py artifacts/screening
 ```
 
+## Regenerating the demo screenshot
+
+`docs/demo/demo-screenshot.png` is evidence, not decoration: it must show the
+currently released model. Regenerate it whenever the released checkpoint changes.
+
+```powershell
+python -m pip install playwright
+python -m playwright install chromium
+asl-recognition demo --device cpu --port 7861
+python tools/capture_demo_screenshot.py --port 7861
+```
+
+Playwright is a development tool and is deliberately not a project dependency;
+neither the test suite nor CI needs it. The script drives the real interface and
+keeps whatever the model predicts, including a wrong answer, because a curated
+success case would misrepresent external-domain behaviour.
+
 ## Reproducibility controls
 
 - Python, NumPy, and PyTorch seeds are set from the run configuration.

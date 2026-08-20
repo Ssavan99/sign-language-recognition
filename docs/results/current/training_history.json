@@ -1,106 +1,748 @@
 {
-  "best_epoch": 12,
-  "best_validation_loss": 0.006788890715995504,
-  "checkpoint_sha256": "8b3d071082615de4a21a6303c8e9ca5496a747c6f5707064f26b3d6a9f6c40a7",
-  "duration_seconds": 7236.950897000032,
+  "augmentation_profile": "robust_noflip",
+  "best_epoch": 10,
+  "best_stress_loss": 0.3684737707105707,
+  "best_validation_loss": 0.02567035768098038,
+  "checkpoint_sha256": "ea9208df33b76843ac24eac2188dcce809da3e609629914e99024eb14ba7727e",
+  "duration_seconds": 13585.759997299989,
   "epochs": [
     {
-      "duration_seconds": 574.7842180999578,
+      "duration_seconds": 874.7166108000092,
       "epoch": 1,
-      "train_accuracy": 0.5588407038305824,
-      "train_loss": 1.5174226372719406,
-      "validation_accuracy": 0.8799891146589259,
-      "validation_loss": 0.49973146147561004
+      "memory": {
+        "commit_bytes": 1183866880,
+        "host_available_bytes": 2089549824,
+        "peak_resident_bytes": 780333056,
+        "resident_bytes": 587804672
+      },
+      "stress_accuracy": 0.5602322206095791,
+      "stress_loss": 1.417414805107089,
+      "stress_per_corruption": {
+        "contrast_crush": {
+          "accuracy": 0.5928882438316401,
+          "correct": 817,
+          "total": 1378
+        },
+        "downscale": {
+          "accuracy": 0.49709724238026126,
+          "correct": 685,
+          "total": 1378
+        },
+        "gamma_high": {
+          "accuracy": 0.54644412191582,
+          "correct": 753,
+          "total": 1378
+        },
+        "gamma_low": {
+          "accuracy": 0.6465892597968069,
+          "correct": 891,
+          "total": 1378
+        },
+        "gaussian_noise": {
+          "accuracy": 0.6756168359941945,
+          "correct": 931,
+          "total": 1378
+        },
+        "hue_shift": {
+          "accuracy": 0.5994194484760522,
+          "correct": 826,
+          "total": 1378
+        },
+        "jpeg_q25": {
+          "accuracy": 0.6981132075471698,
+          "correct": 962,
+          "total": 1378
+        },
+        "letterbox": {
+          "accuracy": 0.22568940493468795,
+          "correct": 311,
+          "total": 1378
+        }
+      },
+      "train_accuracy": 0.3266116474618499,
+      "train_loss": 2.2816448755555343,
+      "validation_accuracy": 0.7048258345428157,
+      "validation_loss": 0.9134506506329005
     },
     {
-      "duration_seconds": 585.5870342999697,
+      "duration_seconds": 876.3951895999489,
       "epoch": 2,
-      "train_accuracy": 0.8893062908751168,
-      "train_loss": 0.4099027926084298,
-      "validation_accuracy": 0.9726052249637155,
-      "validation_loss": 0.14814392117957798
+      "memory": {
+        "commit_bytes": 1184411648,
+        "host_available_bytes": 2224947200,
+        "peak_resident_bytes": 780333056,
+        "resident_bytes": 588414976
+      },
+      "stress_accuracy": 0.7519956458635704,
+      "stress_loss": 0.8364576597972428,
+      "stress_per_corruption": {
+        "contrast_crush": {
+          "accuracy": 0.865021770682148,
+          "correct": 1192,
+          "total": 1378
+        },
+        "downscale": {
+          "accuracy": 0.5268505079825835,
+          "correct": 726,
+          "total": 1378
+        },
+        "gamma_high": {
+          "accuracy": 0.8258345428156749,
+          "correct": 1138,
+          "total": 1378
+        },
+        "gamma_low": {
+          "accuracy": 0.8817126269956459,
+          "correct": 1215,
+          "total": 1378
+        },
+        "gaussian_noise": {
+          "accuracy": 0.8570391872278664,
+          "correct": 1181,
+          "total": 1378
+        },
+        "hue_shift": {
+          "accuracy": 0.8178519593613933,
+          "correct": 1127,
+          "total": 1378
+        },
+        "jpeg_q25": {
+          "accuracy": 0.8773584905660378,
+          "correct": 1209,
+          "total": 1378
+        },
+        "letterbox": {
+          "accuracy": 0.36429608127721336,
+          "correct": 502,
+          "total": 1378
+        }
+      },
+      "train_accuracy": 0.6475202429149798,
+      "train_loss": 1.1621640447477284,
+      "validation_accuracy": 0.8836175616835994,
+      "validation_loss": 0.3985088464924971
     },
     {
-      "duration_seconds": 592.6173927999916,
+      "duration_seconds": 1320.2799487999873,
       "epoch": 3,
-      "train_accuracy": 0.9500934288383681,
-      "train_loss": 0.19196072728490576,
-      "validation_accuracy": 0.9856676342525399,
-      "validation_loss": 0.06424214014211056
+      "memory": {
+        "commit_bytes": 1116475392,
+        "host_available_bytes": 1855459328,
+        "peak_resident_bytes": 782938112,
+        "resident_bytes": 522694656
+      },
+      "stress_accuracy": 0.8433417997097242,
+      "stress_loss": 0.5653478683382056,
+      "stress_per_corruption": {
+        "contrast_crush": {
+          "accuracy": 0.9325108853410741,
+          "correct": 1285,
+          "total": 1378
+        },
+        "downscale": {
+          "accuracy": 0.5870827285921626,
+          "correct": 809,
+          "total": 1378
+        },
+        "gamma_high": {
+          "accuracy": 0.9325108853410741,
+          "correct": 1285,
+          "total": 1378
+        },
+        "gamma_low": {
+          "accuracy": 0.9346879535558781,
+          "correct": 1288,
+          "total": 1378
+        },
+        "gaussian_noise": {
+          "accuracy": 0.941944847605225,
+          "correct": 1298,
+          "total": 1378
+        },
+        "hue_shift": {
+          "accuracy": 0.9085631349782293,
+          "correct": 1252,
+          "total": 1378
+        },
+        "jpeg_q25": {
+          "accuracy": 0.9492017416545718,
+          "correct": 1308,
+          "total": 1378
+        },
+        "letterbox": {
+          "accuracy": 0.5602322206095791,
+          "correct": 772,
+          "total": 1378
+        }
+      },
+      "train_accuracy": 0.74994160697602,
+      "train_loss": 0.8019811370149278,
+      "validation_accuracy": 0.9605406386066764,
+      "validation_loss": 0.1791530900631615
     },
     {
-      "duration_seconds": 600.9913822000381,
+      "duration_seconds": 1903.8020128000062,
       "epoch": 4,
-      "train_accuracy": 0.9653534724384927,
-      "train_loss": 0.12869063796599087,
-      "validation_accuracy": 0.9920174165457184,
-      "validation_loss": 0.06294592379468003
+      "memory": {
+        "commit_bytes": 1116798976,
+        "host_available_bytes": 1792032768,
+        "peak_resident_bytes": 782938112,
+        "resident_bytes": 523022336
+      },
+      "stress_accuracy": 0.8496915820029027,
+      "stress_loss": 0.49306869412757487,
+      "stress_per_corruption": {
+        "contrast_crush": {
+          "accuracy": 0.9238026124818578,
+          "correct": 1273,
+          "total": 1378
+        },
+        "downscale": {
+          "accuracy": 0.6015965166908563,
+          "correct": 829,
+          "total": 1378
+        },
+        "gamma_high": {
+          "accuracy": 0.9114658925979681,
+          "correct": 1256,
+          "total": 1378
+        },
+        "gamma_low": {
+          "accuracy": 0.9412191582002902,
+          "correct": 1297,
+          "total": 1378
+        },
+        "gaussian_noise": {
+          "accuracy": 0.9245283018867925,
+          "correct": 1274,
+          "total": 1378
+        },
+        "hue_shift": {
+          "accuracy": 0.9317851959361393,
+          "correct": 1284,
+          "total": 1378
+        },
+        "jpeg_q25": {
+          "accuracy": 0.9448476052249637,
+          "correct": 1302,
+          "total": 1378
+        },
+        "letterbox": {
+          "accuracy": 0.6182873730043541,
+          "correct": 852,
+          "total": 1378
+        }
+      },
+      "train_accuracy": 0.8023590781687948,
+      "train_loss": 0.6336747208550428,
+      "validation_accuracy": 0.9528301886792453,
+      "validation_loss": 0.14997100217858564
     },
     {
-      "duration_seconds": 595.7536861000117,
+      "duration_seconds": 1980.1012424000073,
       "epoch": 5,
-      "train_accuracy": 0.9720881345375273,
-      "train_loss": 0.09742243138522755,
-      "validation_accuracy": 0.9899310595065312,
-      "validation_loss": 0.03658661368468247
+      "memory": {
+        "commit_bytes": 1116459008,
+        "host_available_bytes": 1610358784,
+        "peak_resident_bytes": 782938112,
+        "resident_bytes": 522743808
+      },
+      "stress_accuracy": 0.872278664731495,
+      "stress_loss": 0.43490972890787594,
+      "stress_per_corruption": {
+        "contrast_crush": {
+          "accuracy": 0.967343976777939,
+          "correct": 1333,
+          "total": 1378
+        },
+        "downscale": {
+          "accuracy": 0.5776487663280117,
+          "correct": 796,
+          "total": 1378
+        },
+        "gamma_high": {
+          "accuracy": 0.9296081277213353,
+          "correct": 1281,
+          "total": 1378
+        },
+        "gamma_low": {
+          "accuracy": 0.9709724238026125,
+          "correct": 1338,
+          "total": 1378
+        },
+        "gaussian_noise": {
+          "accuracy": 0.969521044992743,
+          "correct": 1336,
+          "total": 1378
+        },
+        "hue_shift": {
+          "accuracy": 0.9666182873730044,
+          "correct": 1332,
+          "total": 1378
+        },
+        "jpeg_q25": {
+          "accuracy": 0.9716981132075472,
+          "correct": 1339,
+          "total": 1378
+        },
+        "letterbox": {
+          "accuracy": 0.6248185776487664,
+          "correct": 861,
+          "total": 1378
+        }
+      },
+      "train_accuracy": 0.8332295235129243,
+      "train_loss": 0.533356821488755,
+      "validation_accuracy": 0.9768686502177069,
+      "validation_loss": 0.08363769724849779
     },
     {
-      "duration_seconds": 605.2050257999799,
+      "duration_seconds": 1681.7892049000366,
       "epoch": 6,
-      "train_accuracy": 0.978939582684522,
-      "train_loss": 0.07449976262720305,
-      "validation_accuracy": 0.996099419448476,
-      "validation_loss": 0.021470793127085986
+      "memory": {
+        "commit_bytes": 1184329728,
+        "host_available_bytes": 1547767808,
+        "peak_resident_bytes": 782938112,
+        "resident_bytes": 548880384
+      },
+      "stress_accuracy": 0.8662010159651669,
+      "stress_loss": 0.457157591363234,
+      "stress_per_corruption": {
+        "contrast_crush": {
+          "accuracy": 0.9782293178519593,
+          "correct": 1348,
+          "total": 1378
+        },
+        "downscale": {
+          "accuracy": 0.5123367198838897,
+          "correct": 706,
+          "total": 1378
+        },
+        "gamma_high": {
+          "accuracy": 0.9404934687953556,
+          "correct": 1296,
+          "total": 1378
+        },
+        "gamma_low": {
+          "accuracy": 0.9760522496371553,
+          "correct": 1345,
+          "total": 1378
+        },
+        "gaussian_noise": {
+          "accuracy": 0.9738751814223512,
+          "correct": 1342,
+          "total": 1378
+        },
+        "hue_shift": {
+          "accuracy": 0.9644412191582002,
+          "correct": 1329,
+          "total": 1378
+        },
+        "jpeg_q25": {
+          "accuracy": 0.974600870827286,
+          "correct": 1343,
+          "total": 1378
+        },
+        "letterbox": {
+          "accuracy": 0.6095791001451378,
+          "correct": 840,
+          "total": 1378
+        }
+      },
+      "train_accuracy": 0.8540369043911554,
+      "train_loss": 0.4606411305683419,
+      "validation_accuracy": 0.9797714078374455,
+      "validation_loss": 0.07025519945324202
     },
     {
-      "duration_seconds": 604.5067553999834,
+      "duration_seconds": 795.2987976000877,
       "epoch": 7,
-      "train_accuracy": 0.981255839302398,
-      "train_loss": 0.06539176219777874,
-      "validation_accuracy": 0.995555152394775,
-      "validation_loss": 0.018431513161422632
+      "memory": {
+        "commit_bytes": 1184182272,
+        "host_available_bytes": 2450128896,
+        "peak_resident_bytes": 782938112,
+        "resident_bytes": 409010176
+      },
+      "stress_accuracy": 0.8828918722786647,
+      "stress_loss": 0.4073793033789438,
+      "stress_per_corruption": {
+        "contrast_crush": {
+          "accuracy": 0.9840348330914369,
+          "correct": 1356,
+          "total": 1378
+        },
+        "downscale": {
+          "accuracy": 0.5870827285921626,
+          "correct": 809,
+          "total": 1378
+        },
+        "gamma_high": {
+          "accuracy": 0.9658925979680697,
+          "correct": 1331,
+          "total": 1378
+        },
+        "gamma_low": {
+          "accuracy": 0.9869375907111756,
+          "correct": 1360,
+          "total": 1378
+        },
+        "gaussian_noise": {
+          "accuracy": 0.9811320754716981,
+          "correct": 1352,
+          "total": 1378
+        },
+        "hue_shift": {
+          "accuracy": 0.9731494920174165,
+          "correct": 1341,
+          "total": 1378
+        },
+        "jpeg_q25": {
+          "accuracy": 0.988388969521045,
+          "correct": 1362,
+          "total": 1378
+        },
+        "letterbox": {
+          "accuracy": 0.5965166908563135,
+          "correct": 822,
+          "total": 1378
+        }
+      },
+      "train_accuracy": 0.8700755216443475,
+      "train_loss": 0.415920526225483,
+      "validation_accuracy": 0.9887518142235123,
+      "validation_loss": 0.044371045705456295
     },
     {
-      "duration_seconds": 642.5041955999914,
+      "duration_seconds": 853.6525285999523,
       "epoch": 8,
-      "train_accuracy": 0.9826378075365929,
-      "train_loss": 0.057700793561938954,
-      "validation_accuracy": 0.9880261248185777,
-      "validation_loss": 0.03898702219020043
+      "memory": {
+        "commit_bytes": 1184296960,
+        "host_available_bytes": 2826506240,
+        "peak_resident_bytes": 782938112,
+        "resident_bytes": 357605376
+      },
+      "stress_accuracy": 0.8931422351233672,
+      "stress_loss": 0.38012001675611745,
+      "stress_per_corruption": {
+        "contrast_crush": {
+          "accuracy": 0.9876632801161103,
+          "correct": 1361,
+          "total": 1378
+        },
+        "downscale": {
+          "accuracy": 0.6161103047895501,
+          "correct": 849,
+          "total": 1378
+        },
+        "gamma_high": {
+          "accuracy": 0.9782293178519593,
+          "correct": 1348,
+          "total": 1378
+        },
+        "gamma_low": {
+          "accuracy": 0.9927431059506531,
+          "correct": 1368,
+          "total": 1378
+        },
+        "gaussian_noise": {
+          "accuracy": 0.9891146589259797,
+          "correct": 1363,
+          "total": 1378
+        },
+        "hue_shift": {
+          "accuracy": 0.9825834542815675,
+          "correct": 1354,
+          "total": 1378
+        },
+        "jpeg_q25": {
+          "accuracy": 0.9891146589259797,
+          "correct": 1363,
+          "total": 1378
+        },
+        "letterbox": {
+          "accuracy": 0.6095791001451378,
+          "correct": 840,
+          "total": 1378
+        }
+      },
+      "train_accuracy": 0.8783284023668639,
+      "train_loss": 0.3802867308839093,
+      "validation_accuracy": 0.9922895500725689,
+      "validation_loss": 0.030839527072897385
     },
     {
-      "duration_seconds": 603.2424219999812,
+      "duration_seconds": 819.7299099999946,
       "epoch": 9,
-      "train_accuracy": 0.9859856742447836,
-      "train_loss": 0.04790388842524305,
-      "validation_accuracy": 0.9991835994194485,
-      "validation_loss": 0.007904959024519877
+      "memory": {
+        "commit_bytes": 1184346112,
+        "host_available_bytes": 3174215680,
+        "peak_resident_bytes": 782938112,
+        "resident_bytes": 336080896
+      },
+      "stress_accuracy": 0.8953193033381712,
+      "stress_loss": 0.3732397325082813,
+      "stress_per_corruption": {
+        "contrast_crush": {
+          "accuracy": 0.9927431059506531,
+          "correct": 1368,
+          "total": 1378
+        },
+        "downscale": {
+          "accuracy": 0.5689404934687954,
+          "correct": 784,
+          "total": 1378
+        },
+        "gamma_high": {
+          "accuracy": 0.9775036284470247,
+          "correct": 1347,
+          "total": 1378
+        },
+        "gamma_low": {
+          "accuracy": 0.9927431059506531,
+          "correct": 1368,
+          "total": 1378
+        },
+        "gaussian_noise": {
+          "accuracy": 0.9905660377358491,
+          "correct": 1365,
+          "total": 1378
+        },
+        "hue_shift": {
+          "accuracy": 0.9833091436865021,
+          "correct": 1355,
+          "total": 1378
+        },
+        "jpeg_q25": {
+          "accuracy": 0.9912917271407837,
+          "correct": 1366,
+          "total": 1378
+        },
+        "letterbox": {
+          "accuracy": 0.6654571843251088,
+          "correct": 917,
+          "total": 1378
+        }
+      },
+      "train_accuracy": 0.885530208657739,
+      "train_loss": 0.35972187448813886,
+      "validation_accuracy": 0.9925616835994194,
+      "validation_loss": 0.029914931836153097
     },
     {
-      "duration_seconds": 609.4825948000071,
+      "duration_seconds": 878.1607827999396,
       "epoch": 10,
-      "train_accuracy": 0.986958891311118,
-      "train_loss": 0.04341949575340792,
-      "validation_accuracy": 0.997278664731495,
-      "validation_loss": 0.015777086807542567
+      "memory": {
+        "commit_bytes": 1184501760,
+        "host_available_bytes": 2670960640,
+        "peak_resident_bytes": 782938112,
+        "resident_bytes": 326729728
+      },
+      "stress_accuracy": 0.8996734397677794,
+      "stress_loss": 0.3684737707105707,
+      "stress_per_corruption": {
+        "contrast_crush": {
+          "accuracy": 0.9804063860667634,
+          "correct": 1351,
+          "total": 1378
+        },
+        "downscale": {
+          "accuracy": 0.6756168359941945,
+          "correct": 931,
+          "total": 1378
+        },
+        "gamma_high": {
+          "accuracy": 0.9833091436865021,
+          "correct": 1355,
+          "total": 1378
+        },
+        "gamma_low": {
+          "accuracy": 0.9869375907111756,
+          "correct": 1360,
+          "total": 1378
+        },
+        "gaussian_noise": {
+          "accuracy": 0.9862119013062409,
+          "correct": 1359,
+          "total": 1378
+        },
+        "hue_shift": {
+          "accuracy": 0.9862119013062409,
+          "correct": 1359,
+          "total": 1378
+        },
+        "jpeg_q25": {
+          "accuracy": 0.9912917271407837,
+          "correct": 1366,
+          "total": 1378
+        },
+        "letterbox": {
+          "accuracy": 0.6074020319303338,
+          "correct": 837,
+          "total": 1378
+        }
+      },
+      "train_accuracy": 0.8967027405792588,
+      "train_loss": 0.3299623585051742,
+      "validation_accuracy": 0.9937409288824384,
+      "validation_loss": 0.02567035768098038
     },
     {
-      "duration_seconds": 609.0686216999893,
+      "duration_seconds": 840.5696222000988,
       "epoch": 11,
-      "train_accuracy": 0.9883992525692931,
-      "train_loss": 0.03864938585779115,
-      "validation_accuracy": 0.9985486211901307,
-      "validation_loss": 0.007835355681549512
+      "memory": {
+        "commit_bytes": 1115095040,
+        "host_available_bytes": 3968081920,
+        "peak_resident_bytes": 782938112,
+        "resident_bytes": 259952640
+      },
+      "stress_accuracy": 0.8836175616835994,
+      "stress_loss": 0.4309758359846133,
+      "stress_per_corruption": {
+        "contrast_crush": {
+          "accuracy": 0.9709724238026125,
+          "correct": 1338,
+          "total": 1378
+        },
+        "downscale": {
+          "accuracy": 0.6197387518142236,
+          "correct": 854,
+          "total": 1378
+        },
+        "gamma_high": {
+          "accuracy": 0.9448476052249637,
+          "correct": 1302,
+          "total": 1378
+        },
+        "gamma_low": {
+          "accuracy": 0.9833091436865021,
+          "correct": 1355,
+          "total": 1378
+        },
+        "gaussian_noise": {
+          "accuracy": 0.9775036284470247,
+          "correct": 1347,
+          "total": 1378
+        },
+        "hue_shift": {
+          "accuracy": 0.978955007256894,
+          "correct": 1349,
+          "total": 1378
+        },
+        "jpeg_q25": {
+          "accuracy": 0.9862119013062409,
+          "correct": 1359,
+          "total": 1378
+        },
+        "letterbox": {
+          "accuracy": 0.6074020319303338,
+          "correct": 837,
+          "total": 1378
+        }
+      },
+      "train_accuracy": 0.901646683276238,
+      "train_loss": 0.30850049843115435,
+      "validation_accuracy": 0.9863933236574746,
+      "validation_loss": 0.044167593331015643
     },
     {
-      "duration_seconds": 613.1023221000214,
+      "duration_seconds": 760.7363710000645,
       "epoch": 12,
-      "train_accuracy": 0.9907155091871691,
-      "train_loss": 0.03247578248153352,
-      "validation_accuracy": 0.9985486211901307,
-      "validation_loss": 0.006788890715995504
+      "memory": {
+        "commit_bytes": 1369157632,
+        "host_available_bytes": 4020822016,
+        "peak_resident_bytes": 782938112,
+        "resident_bytes": 508882944
+      },
+      "stress_accuracy": 0.8826197387518142,
+      "stress_loss": 0.47232763823760043,
+      "stress_per_corruption": {
+        "contrast_crush": {
+          "accuracy": 0.9891146589259797,
+          "correct": 1363,
+          "total": 1378
+        },
+        "downscale": {
+          "accuracy": 0.6342525399129173,
+          "correct": 874,
+          "total": 1378
+        },
+        "gamma_high": {
+          "accuracy": 0.9629898403483309,
+          "correct": 1327,
+          "total": 1378
+        },
+        "gamma_low": {
+          "accuracy": 0.9920174165457184,
+          "correct": 1367,
+          "total": 1378
+        },
+        "gaussian_noise": {
+          "accuracy": 0.9804063860667634,
+          "correct": 1351,
+          "total": 1378
+        },
+        "hue_shift": {
+          "accuracy": 0.9796806966618288,
+          "correct": 1350,
+          "total": 1378
+        },
+        "jpeg_q25": {
+          "accuracy": 0.988388969521045,
+          "correct": 1362,
+          "total": 1378
+        },
+        "letterbox": {
+          "accuracy": 0.5341074020319303,
+          "correct": 736,
+          "total": 1378
+        }
+      },
+      "train_accuracy": 0.905656337589536,
+      "train_loss": 0.2983632990826479,
+      "validation_accuracy": 0.9866654571843251,
+      "validation_loss": 0.03885469762007932
     }
   ],
   "epochs_completed": 12,
-  "stopped_early": false
+  "memory_final": {
+    "commit_bytes": 1369968640,
+    "host_available_bytes": 4007481344,
+    "peak_resident_bytes": 782938112,
+    "resident_bytes": 509747200
+  },
+  "memory_preflight": {
+    "allow_low_memory": false,
+    "commit_bytes": 909066240,
+    "host_available_bytes": 2760867840,
+    "minimum_available_bytes": 1073741824,
+    "peak_resident_bytes": 339009536,
+    "preflight": "ok",
+    "resident_bytes": 337477632
+  },
+  "peak_resident_bytes": 782938112,
+  "select_on": "stress",
+  "stopped_early": false,
+  "stress_benchmark": {
+    "assignment": "row position modulo corruption count",
+    "corruptions": [
+      "jpeg_q25",
+      "gaussian_noise",
+      "gamma_low",
+      "gamma_high",
+      "hue_shift",
+      "contrast_crush",
+      "letterbox",
+      "downscale"
+    ],
+    "independent_corruptions": [
+      "downscale",
+      "gaussian_noise",
+      "jpeg_q25",
+      "letterbox"
+    ],
+    "row_count": 11024,
+    "row_digest": "1d97daebc9b01dfda857324429eb31cca8300710f65e61c3d38078ede06d533c",
+    "source": "source validation split only",
+    "version": "stress-v1"
+  }
 }

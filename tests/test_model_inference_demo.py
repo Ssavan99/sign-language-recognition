@@ -111,7 +111,7 @@ def test_demo_handles_absent_and_unusable_images() -> None:
     status, scores, detail = format_demo_prediction(_FakePredictor(0.9), None)
     assert "Unable to classify" in status
     assert scores == {}
-    assert "17.56%" in detail
+    assert "31.67%" in detail
 
     status, _, _ = format_demo_prediction(_FakePredictor(0.9), Image.new("RGB", (64, 64), "white"))
     assert "No usable hand image" in status
@@ -125,7 +125,7 @@ def test_demo_labels_low_and_high_confidence_without_overclaiming() -> None:
     assert "Treat this as uncertain" in low_status
     assert "Predicted letter" in high_status
     assert "not a guarantee" in high_status
-    assert "17.56%" in low_detail
+    assert "31.67%" in low_detail
     assert low_detail == high_detail
 
 

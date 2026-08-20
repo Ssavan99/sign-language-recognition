@@ -12,7 +12,7 @@ from .inference import Predictor
 
 DOMAIN_NOTICE = (
     "This model is a controlled-source experiment, not a hand detector or "
-    "accessibility system. External-domain accuracy is 17.56%, and a high "
+    "accessibility system. External-domain accuracy is 31.67%, and a high "
     "softmax score can still be wrong."
 )
 

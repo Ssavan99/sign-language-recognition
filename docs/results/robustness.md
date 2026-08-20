@@ -88,8 +88,83 @@ that drops into the existing CLI, demo, and browser export unchanged.
 
 ## Results
 
-Screening and final results are recorded in this section once the runs complete.
+### Screening
 
-<!-- RESULTS: screening -->
+Two screens were run. The first used 150 images per class for 10 epochs, and its
+curves showed every candidate still climbing steeply at the final epoch. That
+budget measured convergence speed rather than generalisation, and it
+systematically favoured the weakest augmentation, so it was rerun with the
+epoch budget doubled: 100 images per class for 20 epochs, no early stopping,
+seed 42, identical for every candidate.
 
-<!-- RESULTS: final -->
+**Screen 2 (100 per class, 20 epochs, 2,600-row stress set):**
+
+| Profile | Select on | Best epoch | Clean validation | Stress benchmark | Independent corruptions |
+| --- | --- | ---: | ---: | ---: | ---: |
+| `robust_noflip` | stress | 19 | 72.69% | **62.35%** | 58.00% |
+| `robust` | stress | 20 | 64.12% | 51.23% | 47.62% |
+| `baseline` | stress | 19 | 88.54% | 49.27% | **61.62%** |
+| `trivialaugment` | stress | 18 | 66.04% | 39.62% | 51.46% |
+
+`robust_noflip` won under the pre-registered rule, and it also led the first
+screen, so the winner was stable across both budgets. Removing the horizontal
+flip was worth 11.1 stress points over the otherwise identical `robust`, which
+supports the suspicion that flipping a fingerspelled letter produces a different
+shape rather than the same shape seen again.
+
+**The aggregate was not a clean win.** On the four corruptions independent of
+any training augmentation, `baseline` still led, 61.62% to 58.00%. The
+challenger's advantage came mostly from the photometric half of the benchmark,
+which its own colour and grayscale augmentation trains for. That gap did narrow
+as it converged (5.4 points in screen 1, 3.6 in screen 2), and it took the lead
+on `letterbox`, the corruption closest to real capture-domain shift. Going into
+the blind evaluation, this looked more likely to fail the publication rule than
+to pass it.
+
+Screening stress scores are **not** comparable with the final run's: the
+benchmark scores whatever validation rows a run consumes, and these screens used
+2,600 rows against the final run's 11,024. Recorded row digests make that
+mismatch a hard error in `tools/summarize_screening.py` rather than a footnote.
+
+### Final result
+
+`robust_noflip` was trained on the full 51,376-image training split for 12
+epochs, selecting epoch 10 by stress-benchmark loss, then scored exactly once on
+each held-out set.
+
+| Evaluation | Previous model | `robust_noflip` | Change |
+| --- | ---: | ---: | ---: |
+| Internal source test (15,600) | 99.82% | 98.92% | -0.90 pts |
+| External source test (780) | 17.56% | **31.67%** | **+14.10 pts** |
+| Internal-to-external gap | 82.26 pts | 67.25 pts | -15.01 pts |
+
+**The pre-registered rule passed on both criteria** (external gain >= 5 points,
+internal >= 95%), so the released checkpoint was replaced. On the external set
+18 of 26 classes improved, 6 regressed, and 2 were unchanged; zero-recall
+classes fell from six to one.
+
+The blind result contradicted the pessimistic reading of the screening
+breakdown. The independent-corruption sub-score had favoured `baseline`, yet
+`baseline` is the recipe the previous 17.56% model was trained with, and the
+challenger nearly doubled external accuracy. Treating a synthetic corruption
+suite as a stand-in for real capture-domain shift is exactly the inference this
+document warned against, and here the proxy under-predicted rather than
+over-predicted the outcome. It selected a genuinely better model while being
+wrong about the margin.
+
+Stress accuracy at the selected epoch was 89.97% on the full 11,024-row
+validation set, with `letterbox` (60.7%) and `downscale` (67.6%) far below every
+other corruption. Framing and resolution remain the weakest axes, and they are
+the two that most resemble why the external set is hard.
+
+### What this does not establish
+
+- 31.67% is a large relative improvement and still a poor absolute result. Two
+  of every three external images are misclassified. Nothing here is deployable.
+- Only one external capture source has ever been used. Improving on it is not
+  evidence of improvement on a third source.
+- The source corpus still has no signer or session identifiers, so no
+  signer-independent claim is possible at any accuracy.
+- The gain came from augmentation on a single-source corpus. It is a cheaper
+  substitute for diverse training data, not a replacement for it.
+

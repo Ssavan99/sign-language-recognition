@@ -138,7 +138,7 @@ def build_parser() -> argparse.ArgumentParser:
     demo.add_argument(
         "--checkpoint",
         type=_path,
-        default=_path("models/asl_alphabet_cnn_seed42.pt"),
+        default=_path("models/asl_alphabet_cnn_robust_seed42.pt"),
     )
     demo.add_argument("--confidence-threshold", type=float, default=0.60)
     demo.add_argument("--server-name", default="127.0.0.1")

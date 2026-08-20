@@ -12,7 +12,7 @@ from asl_recognition.constants import CLASS_NAMES, IMAGE_MEAN, IMAGE_STD
 from asl_recognition.model import load_checkpoint
 
 ROOT = Path(__file__).resolve().parents[1]
-CHECKPOINT = ROOT / "models" / "asl_alphabet_cnn_seed42.pt"
+CHECKPOINT = ROOT / "models" / "asl_alphabet_cnn_robust_seed42.pt"
 ASSET_DIR = ROOT / "site" / "assets"
 MANIFEST_PATH = ASSET_DIR / "browser-model-manifest.json"
 WEIGHTS_PATH = ASSET_DIR / "asl-alphabet-cnn-v1.f32"

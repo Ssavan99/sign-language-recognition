@@ -162,7 +162,7 @@ Objective2/Models/
 artifacts/
 /models/*
 !/models/README.md
-!/models/asl_alphabet_cnn_seed42.pt
+!/models/asl_alphabet_cnn_robust_seed42.pt
 *.keras
 *.h5
 *.pkl
