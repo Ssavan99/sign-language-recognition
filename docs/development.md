@@ -118,7 +118,19 @@ Summarise a set of screening runs with:
 python tools/summarize_screening.py artifacts/screening
 ```
 
-## Regenerating the demo screenshot
+## Regenerating the README and demo screenshots
+
+The README image is the live website, captured from a locally served copy of
+`site/`. It waits for both classifiers to report ready, so it can never show a
+half-loaded page or a stale prediction:
+
+```powershell
+python -m pip install playwright
+python -m playwright install chromium
+python tools/capture_site_screenshot.py
+```
+
+## Regenerating the local demo screenshot
 
 `docs/demo/demo-screenshot.png` is evidence, not decoration: it must show the
 currently released model. Regenerate it whenever the released checkpoint changes.
