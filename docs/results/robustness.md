@@ -170,3 +170,72 @@ the two that most resemble why the external set is hard.
 - The gain came from augmentation on a single-source corpus. It is a cheaper
   substitute for diverse training data, not a replacement for it.
 
+## Follow-up: does adding a second corpus help? (negative result)
+
+The augmentation result above raised an obvious question: if the model is
+limited by having seen one capture setup, would a second corpus help more than
+augmentation did? This section records that experiment and its answer, which was
+no.
+
+### Source
+
+`ayuraj/asl-dataset`, CC0, 1,815 A-Z images at 400x400, downloaded anonymously
+with no account or key. Two other candidates were rejected on licensing before
+download: `lexset/synthetic-asl-alphabet` grants no reuse, and
+`ammarnassanalhajali/american-sign-language-letters` states no licence.
+
+Against all four existing manifests it had **zero exact and zero perceptual
+overlap**, so the blind external set stayed blind and the internal test
+partition could not be inflated.
+
+It is honest to describe what it actually adds: a different signer, a black
+backdrop, brighter even lighting, and a tighter crop. That is a **second
+controlled studio condition**, not the natural cluttered scenes the external set
+contains. It took the training pool from one domain to two; it did not make the
+pool naturally diverse.
+
+### Method
+
+The winning profile was held fixed at `robust_noflip` so the only change was the
+data. The supplement was repeated 7 times to reach 14.8% of a 60,266-image pool
+-- enough to matter against 51,376 primary images, not so much that 1,270 unique
+images would simply be memorised. Selection stayed on the frozen `stress-v1`
+benchmark, built only from primary validation images. The external set was
+scored once, after training finished.
+
+### Result
+
+| Evaluation | Released model | Enlarged pool | Change |
+| --- | ---: | ---: | ---: |
+| Internal source test (15,600) | 98.92% | 97.33% | -1.59 pts |
+| **External blind test (780)** | **31.67%** | **30.64%** | **-1.03 pts** |
+| Supplement held-out test (260) | not trained on it | 94.23% | -- |
+
+**The pre-registered rule failed, so the released model was retained.**
+
+The -1.03 point external change is 0.62 standard errors on 780 samples, so the
+correct reading is *no measurable improvement*, not *made it worse*. The
+1.59-point internal drop is a real cost. Zero-recall external classes rose from
+one to four.
+
+### Why this is worth recording
+
+The model learned the second corpus almost perfectly -- **94.23%** on a held-out
+slice it never trained on -- while transfer to the external set did not move at
+all. That is the informative part.
+
+Adding a second corpus taught the model that corpus. It did not teach it to
+generalise. **Domain count is not the lever; domain kind is.** Both training
+corpora are studio captures against a uniform backdrop, and the external set is
+neither. Doubling the number of uniform-backdrop domains does nothing for images
+with real backgrounds, cluttered scenes, and natural light.
+
+This also bounds the augmentation result above more sharply. Augmentation moved
+external accuracy 14.10 points; a whole additional corpus of the wrong kind moved
+it by nothing. The remaining gap is unlikely to close without training data that
+actually resembles the deployment condition -- varied real backgrounds, lighting,
+distances, and cameras -- rather than more of the same kind of data.
+
+The supplementary-corpus pipeline is retained in the repository because the
+experiment is reproducible from it, and because a genuinely diverse source could
+be dropped into the same path unchanged.

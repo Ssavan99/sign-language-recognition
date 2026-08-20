@@ -135,6 +135,36 @@ neither the test suite nor CI needs it. The script drives the real interface and
 keeps whatever the model predicts, including a wrong answer, because a curated
 success case would misrepresent external-domain behaviour.
 
+## Adding a supplementary training corpus
+
+A second labelled A-Z corpus can be folded into training without touching the
+held-out sets:
+
+```powershell
+python tools/prepare_supplementary_source.py `
+  --source <downloaded-corpus-root> --output data/raw/supplement
+asl-recognition prepare --source-root data/raw/supplement --output-dir data/manifests-supplement
+asl-recognition train --source-root Datasets --output-dir artifacts/training/run `
+  --augmentation-profile robust_noflip --select-on stress `
+  --extra-manifest-dir data/manifests-supplement --extra-source-root data/raw/supplement `
+  --extra-repeat 7 --device cpu
+```
+
+- The normaliser skips any image whose bytes already appear in an existing
+  manifest, matches class directories case-insensitively, and never walks a
+  nested duplicate copy of the corpus.
+- Training refuses to start if the supplement shares an image with the primary
+  train, validation, or untouched test split.
+- The supplement contributes training data only. It never joins the validation
+  split or the stress benchmark, so the selection signal is unchanged.
+- `--extra-repeat` weights a small second domain against a much larger primary
+  one. A held-out slice of the supplement is scored each epoch as a
+  second-domain diagnostic; it is reported, never selected on.
+
+This path was used for the negative result recorded in
+[results/robustness.md](results/robustness.md): a second *studio* corpus was
+learned almost perfectly without improving external transfer at all.
+
 ## Reproducibility controls
 
 - Python, NumPy, and PyTorch seeds are set from the run configuration.
