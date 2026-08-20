@@ -35,6 +35,20 @@ jobs:
       - name: Check formatting
         run: ruff format --check src tests tools
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # The Python suite proves the exported weights are the checkpoint. These
+      # prove the browser's own forward pass and landmark normaliser reproduce
+      # PyTorch, which nothing else checks: a correct network fed wrongly
+      # normalised numbers still returns confident nonsense.
+      - name: Check browser model parity
+        run: |
+          node tools/check_browser_model.mjs
+          node tools/check_landmark_model.mjs
+
       - name: Test generated-data workflow
         env:
           MPLBACKEND: Agg

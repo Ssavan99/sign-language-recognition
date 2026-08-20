@@ -1,0 +1,13 @@
+{
+  "_comment": "Fixed division of the external capture set. Experiments iterate on the dev half; the final half is scored at most once per published model. Regenerate with tools/split_external_holdout.py -- the seed is fixed, so the halves cannot be re-drawn to flatter a result.",
+  "dev": {
+    "count": 390,
+    "row_digest": "fd3eea2accc3fb674f0dc35238272a96e1a995c1338a4b233ad78eb834a97e6a"
+  },
+  "final": {
+    "count": 390,
+    "row_digest": "b16be9705d5e516952c76b818714946e34490fe6d22cb262220bd907c403fc71"
+  },
+  "seed": 20260820,
+  "source_manifest": "data\\manifests\\external.csv"
+}

@@ -1,0 +1,178 @@
+{
+  "format": "asl-landmark-mlp-v1",
+  "source_checkpoint_sha256": "89ddd2b9791e6ae37eb03b16ba2f5ba81d74a189a895a5c9c079f910db373dd5",
+  "architecture": {
+    "name": "landmark_mlp_v1",
+    "num_classes": 26,
+    "hidden": [
+      256,
+      128
+    ],
+    "dropout": 0.3,
+    "input_dimension": 79
+  },
+  "feature_contract": "landmark-v1",
+  "feature_dimension": 79,
+  "class_names": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z"
+  ],
+  "hand_landmarker_task_url": "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task",
+  "landmark_indices": {
+    "wrist": 0,
+    "index_mcp": 5,
+    "middle_mcp": 9,
+    "ring_mcp": 13,
+    "pinky_mcp": 17,
+    "fingertips": [
+      4,
+      8,
+      12,
+      16,
+      20
+    ]
+  },
+  "float_count": 58266,
+  "weight_sha256": "0736bbfa851b1a6e6b0ea2bdb7b7f65bb99994255c11167cf7ace8a1ef1c8be1",
+  "tensors": [
+    {
+      "name": "network.0.weight",
+      "shape": [
+        256,
+        79
+      ],
+      "offset": 0,
+      "length": 20224
+    },
+    {
+      "name": "network.0.bias",
+      "shape": [
+        256
+      ],
+      "offset": 20224,
+      "length": 256
+    },
+    {
+      "name": "network.1.weight",
+      "shape": [
+        256
+      ],
+      "offset": 20480,
+      "length": 256
+    },
+    {
+      "name": "network.1.bias",
+      "shape": [
+        256
+      ],
+      "offset": 20736,
+      "length": 256
+    },
+    {
+      "name": "network.1.running_mean",
+      "shape": [
+        256
+      ],
+      "offset": 20992,
+      "length": 256
+    },
+    {
+      "name": "network.1.running_var",
+      "shape": [
+        256
+      ],
+      "offset": 21248,
+      "length": 256
+    },
+    {
+      "name": "network.4.weight",
+      "shape": [
+        128,
+        256
+      ],
+      "offset": 21504,
+      "length": 32768
+    },
+    {
+      "name": "network.4.bias",
+      "shape": [
+        128
+      ],
+      "offset": 54272,
+      "length": 128
+    },
+    {
+      "name": "network.5.weight",
+      "shape": [
+        128
+      ],
+      "offset": 54400,
+      "length": 128
+    },
+    {
+      "name": "network.5.bias",
+      "shape": [
+        128
+      ],
+      "offset": 54528,
+      "length": 128
+    },
+    {
+      "name": "network.5.running_mean",
+      "shape": [
+        128
+      ],
+      "offset": 54656,
+      "length": 128
+    },
+    {
+      "name": "network.5.running_var",
+      "shape": [
+        128
+      ],
+      "offset": 54784,
+      "length": 128
+    },
+    {
+      "name": "network.8.weight",
+      "shape": [
+        26,
+        128
+      ],
+      "offset": 54912,
+      "length": 3328
+    },
+    {
+      "name": "network.8.bias",
+      "shape": [
+        26
+      ],
+      "offset": 58240,
+      "length": 26
+    }
+  ]
+}

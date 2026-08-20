@@ -770,3 +770,40 @@ code {
     animation: none;
   }
 }
+
+/* Classifier selector. The landmark option is the default because it is
+   dramatically better on real captures; the pixel option stays visible because
+   the comparison between them is the point of the page. */
+.model-choice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1rem;
+  margin: 0 0 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2, rgba(255, 255, 255, 0.03));
+}
+.model-choice__label {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.model-choice label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+.model-choice em {
+  font-style: normal;
+  font-size: 0.78rem;
+  opacity: 0.65;
+}
+
+/* A tile for the number that finally went the right way. Uses the same visual
+   weight as the alert tile so good and bad news are presented alike. */
+.metric-strip__good strong { color: var(--good, #7fd4a0); }

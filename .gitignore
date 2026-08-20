@@ -163,6 +163,7 @@ artifacts/
 /models/*
 !/models/README.md
 !/models/asl_alphabet_cnn_robust_seed42.pt
+!/models/asl_landmark_mlp_seed42.pt
 *.keras
 *.h5
 *.pkl

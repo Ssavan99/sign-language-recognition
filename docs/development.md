@@ -165,6 +165,47 @@ This path was used for the negative result recorded in
 [results/robustness.md](results/robustness.md): a second *studio* corpus was
 learned almost perfectly without improving external transfer at all.
 
+## The landmark classifier
+
+A second model reads 21 hand keypoints instead of pixels. Rebuilding it end to
+end requires MediaPipe, a development-only dependency:
+
+```powershell
+python -m pip install mediapipe
+python tools/extract_landmarks.py --manifest data/manifests/train.csv `
+  --source-root Datasets --output artifacts/landmarks/primary-train.npz --limit-per-class 800
+```
+
+Detection is the expensive step and never changes for a fixed image, so features
+are cached to `.npz` and training reads the cache. Each cache records the
+manifest and feature contract it came from; a stale cache is rejected rather than
+silently mixed with current code.
+
+Training takes about a minute:
+
+```powershell
+python -c "from pathlib import Path; from asl_recognition.landmark_training import train_landmark_model; train_landmark_model([Path('artifacts/landmarks/primary-train.npz')], [Path('artifacts/landmarks/primary-val.npz')], Path('artifacts/landmark-run'))"
+```
+
+Then export and verify:
+
+```powershell
+python tools/export_landmark_model.py
+node tools/check_landmark_model.mjs
+```
+
+The parity check covers two things, because either failing alone yields
+confident nonsense: the browser forward pass against PyTorch, and the JavaScript
+normaliser against a feature vector produced by Python. The normaliser in
+`site/landmark-model.mjs` must stay byte-compatible with
+`src/asl_recognition/landmarks.py`; landmark features mean nothing under a
+different normalisation, so the checkpoint records its feature contract and
+refuses to load under another.
+
+Accuracy for this model is always reported over every image considered, counting
+an undetected hand as a wrong answer. The detected-only figure is given
+separately and never as the headline.
+
 ## Reproducibility controls
 
 - Python, NumPy, and PyTorch seeds are set from the run configuration.
