@@ -106,6 +106,23 @@ def build_parser() -> argparse.ArgumentParser:
         help="Training-augmentation recipe. Inference preprocessing is unaffected.",
     )
     train.add_argument(
+        "--extra-manifest-dir",
+        type=_path,
+        help="Manifest directory for a supplementary training corpus.",
+    )
+    train.add_argument(
+        "--extra-source-root",
+        type=_path,
+        help="Image root for the supplementary training corpus.",
+    )
+    train.add_argument(
+        "--extra-repeat",
+        type=int,
+        default=1,
+        help="Times to repeat the supplementary corpus per epoch, to weight a small "
+        "second domain against a much larger primary one.",
+    )
+    train.add_argument(
         "--select-on",
         choices=("validation", "stress"),
         default="validation",
@@ -244,6 +261,9 @@ def _train(args: argparse.Namespace) -> dict:
         allow_low_memory=args.allow_low_memory,
         augmentation_profile=args.augmentation_profile,
         select_on=args.select_on,
+        extra_manifest_dir=args.extra_manifest_dir,
+        extra_source_root=args.extra_source_root,
+        extra_repeat=args.extra_repeat,
     )
     _print_result(result)
     return result

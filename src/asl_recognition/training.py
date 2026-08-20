@@ -18,7 +18,7 @@ import numpy as np
 import torch
 from torch import nn
 from torch.optim import AdamW
-from torch.utils.data import DataLoader
+from torch.utils.data import ConcatDataset, DataLoader
 
 from .constants import CLASS_NAMES
 from .data import (
@@ -298,6 +298,9 @@ def train_model(
     allow_low_memory: bool = False,
     augmentation_profile: str = DEFAULT_AUGMENTATION_PROFILE,
     select_on: str = "validation",
+    extra_manifest_dir: Path | None = None,
+    extra_source_root: Path | None = None,
+    extra_repeat: int = 1,
 ) -> dict[str, Any]:
     """Train a compact model and write a best checkpoint plus run evidence."""
 
@@ -327,6 +330,10 @@ def train_model(
         )
     if select_on not in {"validation", "stress"}:
         raise ValueError("select_on must be 'validation' or 'stress'")
+    if extra_repeat < 1:
+        raise ValueError("extra_repeat must be at least 1")
+    if (extra_manifest_dir is None) != (extra_source_root is None):
+        raise ValueError("extra_manifest_dir and extra_source_root must be given together")
 
     # Check head-room before the expensive manifest verification, so an
     # overloaded host fails in seconds instead of after a full checksum sweep.
@@ -349,6 +356,7 @@ def train_model(
     # The comparison sets have served their only purpose. On the full split they
     # hold about 125,000 hex digests, which is worth releasing before the model
     # and its batches start competing for the same memory.
+    primary_sha = train_hashes | validation_hashes
     del train_hashes, validation_hashes, overlap
     raw_counts = {
         "train": len(train_records),
@@ -401,6 +409,83 @@ def train_model(
     # Each dataset took its own shallow copy, so this releases the list objects
     # rather than the row dicts. The set deletion above is the one that actually
     # reclaims memory.
+    # A supplementary corpus contributes training data only. It never joins the
+    # validation split or the stress benchmark, so the selection signal keeps
+    # measuring the same thing it did before the pool was enlarged.
+    extra_summary: dict[str, Any] | None = None
+    extra_diagnostic_dataset = None
+    if extra_manifest_dir is not None:
+        extra_manifest_dir = Path(extra_manifest_dir)
+        extra_source_root = Path(extra_source_root)
+        extra_train_manifest = _resolve_manifest(extra_manifest_dir, "train")
+        extra_train_records = _read_manifest_rows(extra_train_manifest, "train")
+        # Apply the same subsetting to both corpora. Limiting only the primary
+        # would silently invert their ratio, so a screening run would train on a
+        # pool that looks nothing like the full-scale one it is meant to predict.
+        if limit_per_class is not None:
+            extra_train_records = [
+                extra_train_records[index]
+                for index in _stratified_indices(extra_train_records, limit_per_class)
+            ]
+        elif limit_per_split is not None:
+            extra_train_records = _limited_rows(extra_train_records, limit_per_split)
+        extra_train_records = verify_manifest_rows(extra_train_records, extra_source_root, "train")
+        extra_sha = {record["sha256"] for record in extra_train_records}
+        # Also guard the untouched test partition. Training on it would inflate
+        # exactly the score the enlargement is meant to be judged against.
+        guarded = set(primary_sha)
+        try:
+            test_manifest = _resolve_manifest(manifest_dir, "test")
+        except FileNotFoundError:
+            test_manifest = None
+        if test_manifest is not None:
+            guarded.update(row["sha256"] for row in read_manifest(test_manifest))
+        contaminated = extra_sha.intersection(guarded)
+        if contaminated:
+            raise ValueError(
+                "supplementary training manifest shares "
+                f"{len(contaminated)} exact images with the primary train, validation, "
+                "or test splits"
+            )
+        del guarded
+        extra_dataset = ManifestImageDataset(
+            extra_train_manifest,
+            extra_source_root,
+            build_transforms(image_size, training=True, profile=augmentation_profile),
+            rows=extra_train_records,
+        )
+        train_dataset = ConcatDataset([train_dataset] + [extra_dataset] * extra_repeat)
+        extra_summary = {
+            "manifest_dir": str(extra_manifest_dir.resolve()),
+            "source_root": str(extra_source_root.resolve()),
+            "manifest_sha256": _sha256(extra_train_manifest),
+            "unique_images": len(extra_dataset),
+            "repeat": extra_repeat,
+            "contributed_samples": len(extra_dataset) * extra_repeat,
+            "share_of_training_pool": (len(extra_dataset) * extra_repeat) / len(train_dataset),
+        }
+
+        # A held-out slice of the supplement is a second-domain diagnostic. It is
+        # reported, never selected on: the pre-registered selector is stress-v1.
+        for split in ("test", "validation"):
+            try:
+                diagnostic_manifest = _resolve_manifest(extra_manifest_dir, split)
+            except FileNotFoundError:
+                continue
+            diagnostic_rows = verify_manifest_rows(
+                _read_manifest_rows(diagnostic_manifest, split), extra_source_root, split
+            )
+            extra_diagnostic_dataset = ManifestImageDataset(
+                diagnostic_manifest,
+                extra_source_root,
+                build_transforms(image_size, training=False),
+                rows=diagnostic_rows,
+            )
+            extra_summary["diagnostic_split"] = split
+            extra_summary["diagnostic_samples"] = len(extra_diagnostic_dataset)
+            break
+        del extra_train_records, extra_sha
+
     del train_records, validation_records
     generator = torch.Generator().manual_seed(seed)
     loader_options = {
@@ -425,6 +510,11 @@ def train_model(
     train_loader = DataLoader(train_dataset, shuffle=True, **loader_options)
     validation_loader = DataLoader(validation_dataset, shuffle=False, **eval_loader_options)
     stress_loader = DataLoader(stress_dataset, shuffle=False, **eval_loader_options)
+    extra_loader = (
+        DataLoader(extra_diagnostic_dataset, shuffle=False, **eval_loader_options)
+        if extra_diagnostic_dataset is not None
+        else None
+    )
 
     model = build_model(num_classes=len(CLASS_NAMES)).to(selected_device)
     optimizer = AdamW(model.parameters(), lr=learning_rate, weight_decay=1e-4)
@@ -471,6 +561,11 @@ def train_model(
         stress_loss, stress_accuracy, stress_breakdown = _run_stress_epoch(
             model, stress_loader, loss_function, selected_device
         )
+        extra_accuracy = None
+        if extra_loader is not None:
+            _, extra_accuracy = _run_epoch(
+                model, extra_loader, loss_function, selected_device, None
+            )
         epoch_record = {
             "epoch": epoch,
             "train_loss": train_loss,
@@ -480,6 +575,7 @@ def train_model(
             "stress_loss": stress_loss,
             "stress_accuracy": stress_accuracy,
             "stress_per_corruption": stress_breakdown,
+            "extra_domain_accuracy": extra_accuracy,
             "duration_seconds": time.perf_counter() - epoch_start,
             "memory": memory_report(),
         }
@@ -488,16 +584,20 @@ def train_model(
         # tell a slow epoch from a wedged process, so progress goes to stderr
         # where it stays out of the JSON that stdout carries.
         resident = epoch_record["memory"].get("resident_bytes")
-        print(
-            f"epoch {epoch}/{epochs} "
-            f"train_loss={train_loss:.4f} train_acc={train_accuracy:.4f} "
-            f"val_loss={validation_loss:.4f} val_acc={validation_accuracy:.4f} "
-            f"stress_acc={stress_accuracy:.4f} "
-            f"{epoch_record['duration_seconds']:.1f}s "
-            + (f"rss={resident / 1024**3:.2f}GiB" if resident else ""),
-            file=sys.stderr,
-            flush=True,
-        )
+        heartbeat = [
+            f"epoch {epoch}/{epochs}",
+            f"train_loss={train_loss:.4f}",
+            f"train_acc={train_accuracy:.4f}",
+            f"val_loss={validation_loss:.4f}",
+            f"val_acc={validation_accuracy:.4f}",
+            f"stress_acc={stress_accuracy:.4f}",
+        ]
+        if extra_accuracy is not None:
+            heartbeat.append(f"extra_acc={extra_accuracy:.4f}")
+        heartbeat.append(f"{epoch_record['duration_seconds']:.1f}s")
+        if resident:
+            heartbeat.append(f"rss={resident / 1024**3:.2f}GiB")
+        print(" ".join(heartbeat), file=sys.stderr, flush=True)
 
         selection_loss = stress_loss if select_on == "stress" else validation_loss
         if selection_loss < best_selection_loss:
@@ -579,6 +679,7 @@ def train_model(
         "augmentation_profile": augmentation_profile,
         "select_on": select_on,
         "stress_benchmark": benchmark_definition(stress_dataset),
+        "supplementary_source": extra_summary,
         "class_names": list(CLASS_NAMES),
         "parameter_count": count_parameters(model),
         "checkpoint_path": str(checkpoint_path.resolve()),
