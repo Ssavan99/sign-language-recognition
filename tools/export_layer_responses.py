@@ -16,7 +16,7 @@ from asl_recognition.model import load_checkpoint
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--checkpoint", type=Path, default=Path("models/asl_alphabet_cnn_seed42.pt")
+        "--checkpoint", type=Path, default=Path("models/asl_alphabet_cnn_robust_seed42.pt")
     )
     parser.add_argument("--image", type=Path, default=Path("docs/demo/sample_external_a.jpg"))
     parser.add_argument(

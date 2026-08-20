@@ -8,13 +8,13 @@ Install the optional dependency and launch from the repository root:
 
 ```powershell
 python -m pip install -e ".[demo]"
-asl-recognition demo --checkpoint models/asl_alphabet_cnn_seed42.pt --device cpu
+asl-recognition demo --checkpoint models/asl_alphabet_cnn_robust_seed42.pt --device cpu
 ```
 
 Open the printed local URL. The built-in **External-domain sample — true label A** example provides
-a deterministic check of the interface. The released model predicts N with 75.9% confidence for
+a deterministic check of the interface. The released model predicts L with 76.2% confidence for
 this image. That incorrect, confident result is retained deliberately: it demonstrates why the UI
-always displays the measured 17.56% external-domain accuracy and warns that softmax confidence is
+always displays the measured 31.67% external-domain accuracy and warns that softmax confidence is
 not evidence of real-world reliability.
 
 ![Working local demo showing the domain-shift example](demo-screenshot.png)

@@ -79,6 +79,10 @@ def run_smoke_workflow(output_dir: Path, *, seed: int = 42, device: str = "cpu")
         num_workers=0,
         device=device,
         patience=1,
+        # The smoke fixture is a few hundred generated images. It must stay
+        # runnable on a loaded laptop and on a CI runner, so it opts out of the
+        # head-room floor that guards multi-hour full-split runs.
+        minimum_available_bytes=0,
     )
     checkpoint = Path(training["checkpoint_path"])
     evaluation = evaluate_model(

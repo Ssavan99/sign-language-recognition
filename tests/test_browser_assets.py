@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_browser_weights_exactly_match_released_checkpoint() -> None:
-    checkpoint = ROOT / "models" / "asl_alphabet_cnn_seed42.pt"
+    checkpoint = ROOT / "models" / "asl_alphabet_cnn_robust_seed42.pt"
     manifest_path = ROOT / "site" / "assets" / "browser-model-manifest.json"
     weights_path = ROOT / "site" / "assets" / "asl-alphabet-cnn-v1.f32"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))

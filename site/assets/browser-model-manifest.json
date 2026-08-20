@@ -1,6 +1,6 @@
 {
   "format": "asl-browser-cnn-v1",
-  "source_checkpoint_sha256": "8b3d071082615de4a21a6303c8e9ca5496a747c6f5707064f26b3d6a9f6c40a7",
+  "source_checkpoint_sha256": "ea9208df33b76843ac24eac2188dcce809da3e609629914e99024eb14ba7727e",
   "architecture": {
     "name": "compact_asl_cnn_v1",
     "num_classes": 26,
@@ -53,7 +53,7 @@
     ]
   },
   "float_count": 165218,
-  "weight_sha256": "9a770178c99e9f443ed34e1f54483c7d4a9f7816707b8c102aaa1db9121fc337",
+  "weight_sha256": "ac9895406c7f468f4940f5fa892041ffa47a47644cc8835a15e8766597c56105",
   "tensors": [
     {
       "name": "features.0.0.weight",
