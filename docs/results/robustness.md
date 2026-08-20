@@ -370,3 +370,27 @@ precisely where the previous ones failed, and it is also the honest caveat: the
   is counted as a miss throughout.
 - One external capture source is still the only independent evidence, and 84.62%
   is not a claim about deployment.
+
+## Why the browser and the CLI report different confidences
+
+The pixel classifier reports about **79.6%** in the browser and **76.2%** from the
+Python CLI for the same held-out A image, using the same weights. Both numbers
+appear in this repository, so the difference is worth stating rather than leaving
+a reader to wonder which one is wrong.
+
+Neither is. `tools/check_browser_model.mjs` compares the browser forward pass
+against PyTorch on a synthetic tensor and they agree to within 6e-8, one float32
+ulp. What differs is everything *before* the tensor: the browser resizes with a
+canvas `drawImage`, the CLI resizes with Pillow, and the two resamplers do not
+produce identical 64x64 pixels from a 400x400 source. Both paths then run the
+identical network on slightly different inputs.
+
+It is a useful reminder that a model contract is not only its weights. Two
+faithful implementations of the same network disagree measurably when their
+preprocessing differs, and the pixel model is capture-sensitive enough that a
+resampling difference alone moves its confidence by three points.
+
+The landmark classifier does not have this problem in the same way. Its input is
+21 detected keypoints rather than resampled pixels, so there is no resize step to
+disagree about -- which is the same property that makes it survive a change of
+camera.
