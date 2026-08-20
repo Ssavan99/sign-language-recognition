@@ -64,10 +64,15 @@ def main() -> int:
         page.wait_for_timeout(1500)
         page.get_by_role("button", name="Classify image").click()
 
-        # Wait for the heading to leave its idle state rather than sleeping blindly.
+        # Wait on every terminal state the interface can reach, not just the
+        # confident one. A model that is merely uncertain on the sample is
+        # arguably the more honest evidence, and gating only on "Predicted
+        # letter" would time out rather than capture it -- leaving the committed
+        # screenshot silently stale.
+        terminal = ("Predicted letter", "Treat this as uncertain", "Unable to classify")
         page.wait_for_function(
-            "() => { const h = document.querySelector('h1, h2, h3');"
-            " return document.body.innerText.includes('Predicted letter'); }",
+            "(states) => states.some((state) => document.body.innerText.includes(state))",
+            arg=list(terminal),
             timeout=30_000,
         )
         page.wait_for_timeout(800)
@@ -77,10 +82,23 @@ def main() -> int:
         text = page.inner_text("body")
         browser.close()
 
-    print(f"wrote {args.output.relative_to(ROOT)}")
-    for line in text.splitlines():
-        if "Predicted letter" in line or "Model confidence" in line:
-            print(f"  {line.strip()}")
+    resolved = args.output.resolve()
+    try:
+        shown = resolved.relative_to(ROOT)
+    except ValueError:
+        # A path outside the repository, or a relative one, is still valid output.
+        shown = resolved
+    print(f"wrote {shown}")
+    reported = [
+        line.strip()
+        for line in text.splitlines()
+        if any(state in line for state in terminal) or "Model confidence" in line
+    ]
+    for line in reported:
+        print(f"  {line}")
+    if not reported:
+        print("  warning: no prediction text found; check the capture", file=sys.stderr)
+        return 1
     return 0
 
 
