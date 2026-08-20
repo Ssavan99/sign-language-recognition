@@ -1,18 +1,19 @@
 # ASL Alphabet Image Classifier
 
 A reproducible computer-vision pipeline for classifying isolated A-Z American Sign Language
-alphabet images, with checksummed data manifests, a compact PyTorch model, independent-domain
-evaluation, command-line inference, and an optional local demo.
+alphabet images, with checksummed data manifests, two released models that read the same signs
+differently, independent-domain evaluation, command-line inference, and an optional local demo.
 
 **Project website:** [ssavan99.github.io/sign-language-recognition](https://ssavan99.github.io/sign-language-recognition/) — free local browser inference with an optional camera or image upload.
 
-![Local classifier showing a confident domain-shift failure](docs/demo/demo-screenshot.png)
+![Project website running both classifiers on a held-out external capture](docs/demo/site-screenshot.png)
 
-The screenshot shows the released model predicting **L** at 76.2% confidence for an external
-sample whose true label is **A**. This failure is intentional evidence: the model reaches 98.92%
-accuracy on its same-corpus source test partition but only 31.67% on a separate capture source.
-The project is therefore an isolated-image experiment, not a real-world signing or accessibility
-system.
+The screenshot is the live website classifying a held-out capture whose true label is **A**. Both
+released models run in the browser and they disagree on this image: the landmark classifier reads
+**A** at 94.8%, while the pixel CNN reads **L**. That disagreement is the project's central finding.
+Reading hand geometry scores **84.62%** on held-out captures from a separate source; reading pixels
+scores **31.67%** on the same images, despite 98.92% on its own corpus. This remains an
+isolated-image experiment, not a real-world signing or accessibility system.
 
 ## What the project includes
 
