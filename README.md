@@ -192,6 +192,8 @@ asl-recognition predict docs/demo/sample_external_a.jpg `
 ```
 
 The deterministic sample result is L at approximately 76.2% confidence, despite its true A label.
+The website reports about 79.6% for the same image and the same weights; the two resize the image
+differently, which [docs/results/robustness.md](docs/results/robustness.md) explains.
 
 ## Local demo
 
