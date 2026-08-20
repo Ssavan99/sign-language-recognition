@@ -39,7 +39,7 @@ system.
 | Maintained compact CNN | Untouched test partition from the training corpus | 15,600 | 98.92% | 98.93% |
 | Maintained compact CNN | Separate external capture source | 780 | **31.67%** | 31.74% |
 
-The maintained model classified 15,572 of 15,600 internal test images correctly, but only 137 of
+The maintained model classified 15,432 of 15,600 internal test images correctly, but only 247 of
 780 external images. The 67.25 percentage-point gap is evidence of severe capture-domain bias.
 
 External accuracy nearly doubled, from 17.56% to 31.67%, for a 0.90-point cost on the same-corpus

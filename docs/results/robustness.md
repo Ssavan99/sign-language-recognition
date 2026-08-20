@@ -1,9 +1,11 @@
 # Domain-robustness experiment
 
-The released classifier scores 99.82% on a same-corpus image holdout and 17.56%
-on a separate capture source. That 82.26-point gap is the project's central
-weakness, and this document records the experiment run against it: what was
-tried, how a candidate was chosen, and what the blind test said afterwards.
+The classifier this experiment was run against scored 99.82% on a same-corpus
+image holdout and 17.56% on a separate capture source. That 82.26-point gap was
+the project's central weakness, and this document records the experiment run
+against it: what was tried, how a candidate was chosen, and what the blind test
+said afterwards. It ends with a replaced released model and a gap of 67.25
+points.
 
 ## The problem the experiment has to solve first
 

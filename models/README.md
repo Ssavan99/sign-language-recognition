@@ -13,10 +13,13 @@ the maintained prediction and demo paths.
   preprocessing contract embedded in the checkpoint.
 - Training data: 51,376 images from the prepared primary-source training
   manifest.
-- Model selection: lowest loss on a separate 11,024-image validation manifest.
+- Training-augmentation profile: `robust_noflip`.
+- Model selection: lowest stress-benchmark loss (`stress-v1`, 11,024 rows) over the
+  separate validation manifest. The benchmark is built only from source validation
+  images; the external set was never used to select this checkpoint.
 - Seed: 42.
-- Best epoch: 12 of 12.
-- Size: 674,997 bytes.
+- Best epoch: 10 of 12.
+- Size: 675,893 bytes.
 - SHA-256:
   `ea9208df33b76843ac24eac2188dcce809da3e609629914e99024eb14ba7727e`.
 

@@ -1,0 +1,92 @@
+{
+  "_comment": "Machine-readable record of the released model's headline numbers. tests/test_reported_metrics.py asserts that the figures quoted in README.md, models/README.md, docs/results/current/README.md, and site/index.html match this file, so prose cannot drift away from the model it describes.",
+  "checkpoint": {
+    "augmentation_profile": "robust_noflip",
+    "best_epoch": 10,
+    "epochs_completed": 12,
+    "parameter_count": 164546,
+    "path": "models/asl_alphabet_cnn_robust_seed42.pt",
+    "seed": 42,
+    "select_on": "stress",
+    "sha256": "ea9208df33b76843ac24eac2188dcce809da3e609629914e99024eb14ba7727e",
+    "size_bytes": 675893
+  },
+  "external": {
+    "accuracy": 0.31666666666666665,
+    "correct": 247,
+    "macro_f1": 0.31735791407786834,
+    "per_class_recall": {
+      "A": 0.03333333333333333,
+      "B": 0.06666666666666667,
+      "C": 0.13333333333333333,
+      "D": 0.26666666666666666,
+      "E": 0.1,
+      "F": 0.8333333333333334,
+      "G": 0.36666666666666664,
+      "H": 0.4666666666666667,
+      "I": 0.23333333333333334,
+      "J": 0.6333333333333333,
+      "K": 0.23333333333333334,
+      "L": 0.5666666666666667,
+      "M": 0.36666666666666664,
+      "N": 0.23333333333333334,
+      "O": 0.13333333333333333,
+      "P": 0.8,
+      "Q": 0.5666666666666667,
+      "R": 0.2,
+      "S": 0.0,
+      "T": 0.1,
+      "U": 0.3,
+      "V": 0.13333333333333333,
+      "W": 0.6,
+      "X": 0.26666666666666666,
+      "Y": 0.4,
+      "Z": 0.2
+    },
+    "sample_count": 780,
+    "zero_recall_classes": [
+      "S"
+    ]
+  },
+  "internal": {
+    "accuracy": 0.9892307692307692,
+    "correct": 15432,
+    "macro_f1": 0.9892777195014516,
+    "per_class_recall": {
+      "A": 1.0,
+      "B": 1.0,
+      "C": 1.0,
+      "D": 1.0,
+      "E": 1.0,
+      "F": 1.0,
+      "G": 1.0,
+      "H": 1.0,
+      "I": 0.9883333333333333,
+      "J": 0.9966666666666667,
+      "K": 0.9766666666666667,
+      "L": 1.0,
+      "M": 0.97,
+      "N": 0.95,
+      "O": 1.0,
+      "P": 1.0,
+      "Q": 0.9933333333333333,
+      "R": 0.9966666666666667,
+      "S": 1.0,
+      "T": 0.995,
+      "U": 0.87,
+      "V": 1.0,
+      "W": 0.9883333333333333,
+      "X": 0.995,
+      "Y": 1.0,
+      "Z": 1.0
+    },
+    "sample_count": 15600,
+    "zero_recall_classes": []
+  },
+  "previous_released_model": {
+    "external_accuracy": 0.17564102564102563,
+    "external_macro_f1": 0.16819696617934113,
+    "internal_accuracy": 0.9982051282051282,
+    "sha256": "8b3d071082615de4a21a6303c8e9ca5496a747c6f5707064f26b3d6a9f6c40a7"
+  }
+}
