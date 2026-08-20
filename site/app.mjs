@@ -1,4 +1,5 @@
 import { BrowserASLModel } from "./model.mjs";
+import { LandmarkClassifier } from "./landmark-model.mjs";
 
 const $ = (id) => document.getElementById(id);
 const camera = $("camera");
@@ -10,7 +11,10 @@ const modelContext = modelCanvas.getContext("2d", { willReadFrequently: true });
 const state = {
   model: null, stream: null, source: stillImage, timer: null, running: false,
   objectUrl: null, handLandmarker: null, handBox: null, handLoad: null,
+  landmarkModel: null, landmarkLoad: null, snapshot: null,
 };
+
+const usingLandmarks = () => $("engine-landmark").checked;
 
 function setStatus(message) { $("prediction-status").textContent = message; }
 
@@ -58,6 +62,15 @@ function preprocess(source) {
 
 function renderPrediction(top) {
   const winner = top[0];
+  // No detection is a real outcome, not an error state to hide. Show it as an
+  // absence of an answer rather than leaving the previous letter on screen
+  // looking like a fresh prediction.
+  if (!winner) {
+    $("prediction-title").textContent = "—";
+    $("prediction-confidence").textContent = "No hand detected";
+    $("probabilities").replaceChildren();
+    return;
+  }
   $("prediction-title").textContent = winner.label;
   $("prediction-confidence").textContent = `${(winner.probability * 100).toFixed(1)}% confidence · top of 26 classes`;
   $("probabilities").replaceChildren(...top.map(({ label, probability }) => {
@@ -92,7 +105,7 @@ async function ensureHandLandmarker() {
       );
       state.handLandmarker = await vision.HandLandmarker.createFromOptions(fileset, {
         baseOptions: { modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task" },
-        runningMode: "VIDEO", numHands: 1,
+        runningMode: "IMAGE", numHands: 1,
       });
       return state.handLandmarker;
     })();
@@ -100,28 +113,91 @@ async function ensureHandLandmarker() {
   return state.handLoad;
 }
 
-async function updateHandFrame() {
-  if (!$("auto-frame").checked || !state.handLandmarker || camera.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
-  const result = state.handLandmarker.detectForVideo(camera, performance.now());
+function snapshotOf(source) {
+  const width = source === camera ? camera.videoWidth : source.naturalWidth;
+  const height = source === camera ? camera.videoHeight : source.naturalHeight;
+  if (!width || !height) return null;
+  if (!state.snapshot) state.snapshot = document.createElement("canvas");
+  state.snapshot.width = width;
+  state.snapshot.height = height;
+  state.snapshot.getContext("2d", { willReadFrequently: true }).drawImage(source, 0, 0, width, height);
+  return state.snapshot;
+}
+
+// One detection per tick, shared by the landmark classifier and the pixel
+// model's optional auto-frame, so a frame is never analysed twice.
+async function detectHand(source) {
+  const landmarker = await ensureHandLandmarker();
+  const frame = snapshotOf(source);
+  if (!frame) return null;
+  const result = landmarker.detect(frame);
   const points = result.landmarks?.[0];
+  if (!points?.length) return null;
+  const handedness = result.handednesses?.[0]?.[0]?.categoryName
+    ?? result.handedness?.[0]?.[0]?.categoryName ?? null;
+  return { points, handedness, width: frame.width, height: frame.height };
+}
+
+async function updateHandFrame(detection) {
+  if (!$("auto-frame").checked) return;
+  const points = detection?.points;
   if (!points?.length) { state.handBox = null; drawHandGuide(); return; }
-  const xs = points.map((point) => point.x * camera.videoWidth);
-  const ys = points.map((point) => point.y * camera.videoHeight);
+  const frameWidth = detection.width;
+  const frameHeight = detection.height;
+  const xs = points.map((point) => point.x * frameWidth);
+  const ys = points.map((point) => point.y * frameHeight);
   const minX = Math.max(0, Math.min(...xs));
-  const maxX = Math.min(camera.videoWidth, Math.max(...xs));
+  const maxX = Math.min(frameWidth, Math.max(...xs));
   const minY = Math.max(0, Math.min(...ys));
-  const maxY = Math.min(camera.videoHeight, Math.max(...ys));
+  const maxY = Math.min(frameHeight, Math.max(...ys));
   const padding = Math.max(maxX - minX, maxY - minY) * 0.18;
-  state.handBox = { x: Math.max(0, minX - padding), y: Math.max(0, minY - padding), width: Math.min(camera.videoWidth, maxX + padding) - Math.max(0, minX - padding), height: Math.min(camera.videoHeight, maxY + padding) - Math.max(0, minY - padding) };
+  state.handBox = { x: Math.max(0, minX - padding), y: Math.max(0, minY - padding), width: Math.min(frameWidth, maxX + padding) - Math.max(0, minX - padding), height: Math.min(frameHeight, maxY + padding) - Math.max(0, minY - padding) };
   drawHandGuide();
 }
 
+async function ensureLandmarkModel() {
+  if (state.landmarkModel) return state.landmarkModel;
+  if (!state.landmarkLoad) {
+    state.landmarkLoad = LandmarkClassifier.load(
+      "./assets/landmark-model-manifest.json",
+      "./assets/asl-landmark-mlp-v1.f32",
+    ).then((model) => { state.landmarkModel = model; return model; });
+  }
+  return state.landmarkLoad;
+}
+
 async function infer() {
-  if (!state.model || !state.source || state.running) return;
+  if (!state.source || state.running) return;
   if (state.source === camera && camera.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
   state.running = true;
   try {
-    await updateHandFrame();
+    const landmarkMode = usingLandmarks();
+    // Detect once when either path needs it: the landmark classifier always
+    // does, the pixel path only when auto-frame is on.
+    const detection = landmarkMode || $("auto-frame").checked
+      ? await detectHand(state.source).catch((error) => { console.error(error); return null; })
+      : null;
+    await updateHandFrame(detection);
+    // The small preview always shows the pixel model's input, so the two paths
+    // stay visually comparable even when the landmark classifier is answering.
+    preprocess(state.source);
+
+    if (landmarkMode) {
+      if (!detection) {
+        renderPrediction([]);
+        setStatus("No hand found in this frame. The landmark classifier needs a visible hand; an undetected hand is a failure to answer, not a free pass.");
+        return;
+      }
+      const model = await ensureLandmarkModel();
+      const { ranked } = model.classify(detection.points, detection.handedness);
+      renderPrediction(ranked.slice(0, 3).map((entry) => ({ label: entry.label, probability: entry.probability })));
+      setStatus(state.source === camera
+        ? "Live camera prediction from hand landmarks, about once per second. Position, distance, rotation and lighting are normalised away."
+        : "Prediction computed locally from hand landmarks.");
+      return;
+    }
+
+    if (!state.model) return;
     renderPrediction(state.model.topK(state.model.predict(preprocess(state.source)), 3));
     setStatus(state.source === camera ? "Live camera prediction updates about once per second. Keep one hand inside the guide; try model mirroring if the orientation differs." : "Prediction computed locally from the selected image.");
   } catch (error) { console.error(error); setStatus(`Unable to classify this frame: ${error.message}`); } finally { state.running = false; }
@@ -169,6 +245,20 @@ async function enableAutoFrame() {
   catch (error) { console.error(error); $("auto-frame").checked = false; setStatus("Auto-frame could not load. Use the visible guide and crop zoom instead."); }
 }
 
+function wireEngineChoice() {
+  for (const id of ["engine-landmark", "engine-pixel"]) {
+    $(id).addEventListener("change", () => {
+      $("auto-frame-label").hidden = usingLandmarks();
+      setStatus(usingLandmarks()
+        ? "Hand-landmark classifier selected. It reads 21 keypoints, so background and lighting are normalised away."
+        : "Pixel CNN selected. It reads the 64 x 64 crop shown, so framing, background and lighting all matter.");
+      if (usingLandmarks()) ensureLandmarkModel().catch((error) => console.error(error));
+      infer();
+    });
+  }
+  $("auto-frame-label").hidden = usingLandmarks();
+}
+
 function buildSampleGrid() {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const grid = $("sample-grid");
@@ -182,9 +272,17 @@ function buildSampleGrid() {
 
 async function boot() {
   buildSampleGrid();
+  wireEngineChoice();
   try {
-    $("loader-status").textContent = "Fetching model manifest and 661 KB of released weights…";
-    state.model = await BrowserASLModel.load(); $("model-state").textContent = "Browser model ready";
+    $("loader-status").textContent = "Fetching model manifests and released weights…";
+    // Both classifiers load: the landmark one answers by default, the pixel one
+    // stays a click away so the comparison is live rather than described.
+    const [pixelModel] = await Promise.all([
+      BrowserASLModel.load(),
+      ensureLandmarkModel().catch((error) => { console.error(error); return null; }),
+    ]);
+    state.model = pixelModel;
+    $("model-state").textContent = state.landmarkModel ? "Both classifiers ready" : "Pixel model ready";
     if (stillImage.complete) await infer(); else stillImage.addEventListener("load", infer, { once: true });
     $("loader").hidden = true; $("page").setAttribute("aria-busy", "false"); setStatus("Prediction computed locally from the selected image.");
   } catch (error) { console.error(error); $("loader-status").textContent = `Could not load the browser model: ${error.message}`; $("model-state").textContent = "Model unavailable"; setStatus("The downloadable model could not be loaded. Evaluation evidence remains below."); }

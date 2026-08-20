@@ -289,3 +289,84 @@ a plausible path to 50-60%; cropping pixels is not.
 
 Both padding values at 0.1 and 0.3 scoring 136 is a coincidence of totals, not a
 bug: the crops were verified to differ on every sampled image.
+
+## The landmark classifier: 31.67% to 84.62%
+
+Two experiments had failed to close the capture-domain gap by much. Augmentation
+moved external accuracy 14.10 points; a second training corpus moved it by
+nothing; cropping to the detected hand recovered about six. Each attacked the
+symptom while leaving the cause alone: a pixel classifier reads appearance, and
+appearance is exactly what changes between capture sources.
+
+So the second model does not read pixels.
+
+### Representation
+
+MediaPipe's HandLandmarker returns 21 keypoints. Four normalisation steps remove
+everything about how the photograph was taken:
+
+1. **Mirror left hands** onto right-hand form. The same letter made with either
+   hand is the same sign but mirrored coordinates, and without this the model
+   would have to learn all 26 letters twice.
+2. **Translate** so the wrist is the origin -- removes where the hand was.
+3. **Scale** so the furthest landmark sits at distance 1 -- removes how near the
+   camera it was.
+4. **Rotate** in XY so the middle-finger knuckle points up -- removes tilt.
+
+Sixteen explicit distances are appended (fingertip-to-wrist, fingertip-to-thumb,
+adjacent fingertips, fingertip-to-knuckle) because those are the relationships
+the alphabet actually turns on. That gives 79 features and a 57,498-parameter
+network, trained in 98 seconds on a CPU.
+
+These invariances are the entire justification for the approach, so they are
+asserted in `tests/test_landmarks.py` rather than assumed. Writing those tests
+caught a sign error in the rotation that had left the features not
+rotation-invariant at all.
+
+### Result
+
+Accuracy is reported over **every image considered**, counting an undetected hand
+as a wrong answer, because that is what it is in a camera pipeline. The generous
+figure is given separately rather than as the headline.
+
+| Evaluation | Pixel CNN | Landmark classifier |
+| --- | ---: | ---: |
+| External dev half (390) | 29.74% | **84.10%** |
+| External reserved half (390) | -- | **84.62%** |
+| ...where a hand was detected (378) | -- | 87.30% |
+| Macro F1 | 31.74% | 86.32% |
+| Internal source test (15,600) | 98.92% | 77.25% |
+
+The reserved half was scored once, after the model was fixed, and agrees with the
+dev half to within half a point. The dev half guided nothing except the decision
+to look at the reserved half at all.
+
+### The inversion
+
+The landmark classifier scores **higher on external photographs (84.62%) than on
+the primary corpus (77.25%)**, which reverses every previous result in this
+project. The reason is detection rate:
+
+| Set | Hand detected |
+| --- | ---: |
+| External capture set | 95.6% / 96.9% |
+| Primary corpus | ~80% |
+| Supplementary corpus | ~64% |
+
+MediaPipe finds hands reliably in ordinary photographs and unreliably in the dim,
+tightly-cropped primary images -- where the wrist is often outside the frame --
+and in the black-backdrop supplement. **The corpus that is easiest for a pixel
+model is the hardest for a hand detector.** That is why this approach wins
+precisely where the previous ones failed, and it is also the honest caveat: the
+77.25% internal figure is a detector limitation, not a classification one.
+
+### What it still cannot do
+
+- **J and Z are motion signs.** A still frame cannot resolve them and no amount
+  of geometry will change that.
+- **N (53.3%) and X (26.7%) remain weak.** Fist-like shapes that differ only in
+  thumb placement are genuinely hard from landmarks alone.
+- **No hand, no answer.** Roughly 3% of external images yield nothing, and that
+  is counted as a miss throughout.
+- One external capture source is still the only independent evidence, and 84.62%
+  is not a claim about deployment.

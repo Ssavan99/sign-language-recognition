@@ -83,6 +83,36 @@
     "sample_count": 15600,
     "zero_recall_classes": []
   },
+  "landmark_model": {
+    "_comment": "Second classifier: reads 21 hand keypoints instead of pixels. Accuracy is reported over every image considered, counting an undetected hand as a wrong answer, because that is what it is in a camera pipeline.",
+    "checkpoint": {
+      "best_epoch": 109,
+      "feature_contract": "landmark-v1",
+      "feature_dimension": 79,
+      "parameter_count": 57498,
+      "path": "models/asl_landmark_mlp_seed42.pt",
+      "seed": 42,
+      "sha256": "89ddd2b9791e6ae37eb03b16ba2f5ba81d74a189a895a5c9c079f910db373dd5",
+      "size_bytes": 239733
+    },
+    "external_dev": {
+      "accuracy_over_all_images": 0.841025641025641,
+      "images_considered": 390
+    },
+    "external_final": {
+      "accuracy_over_all_images": 0.8461538461538461,
+      "accuracy_where_detected": 0.873015873015873,
+      "detection_rate": 0.9692307692307692,
+      "images_considered": 390,
+      "macro_f1_where_detected": 0.863210351145751
+    },
+    "internal_test": {
+      "accuracy_over_all_images": 0.7725,
+      "accuracy_where_detected": 0.9770552943084158,
+      "detection_rate": 0.7906410256410257,
+      "images_considered": 15600
+    }
+  },
   "previous_released_model": {
     "external_accuracy": 0.17564102564102563,
     "external_macro_f1": 0.16819696617934113,

@@ -171,3 +171,59 @@ def test_current_external_accuracy_appears_wherever_the_limit_is_stated(relative
     current = _percent(METRICS["external"]["accuracy"])
     if "External-domain accuracy" in text or "external-domain accuracy" in text:
         assert f"{current}%" in text
+
+
+def _landmark() -> dict:
+    return METRICS["landmark_model"]
+
+
+def test_landmark_checkpoint_matches_the_recorded_metrics() -> None:
+    import hashlib
+
+    checkpoint = ROOT / _landmark()["checkpoint"]["path"]
+    assert checkpoint.is_file()
+    assert checkpoint.stat().st_size == _landmark()["checkpoint"]["size_bytes"]
+    assert (
+        hashlib.sha256(checkpoint.read_bytes()).hexdigest() == _landmark()["checkpoint"]["sha256"]
+    )
+
+
+def test_landmark_headline_accuracy_is_quoted_consistently() -> None:
+    headline = _percent(_landmark()["external_final"]["accuracy_over_all_images"])
+    site = _flat("site/index.html")
+    # The page leads with this number, so it must be the measured one.
+    assert f"{headline}%" in site
+    assert f"{headline}%" in _flat("docs/results/robustness.md")
+
+
+def test_landmark_accuracy_is_reported_over_all_images_not_only_detections() -> None:
+    external = _landmark()["external_final"]
+    over_all = external["accuracy_over_all_images"]
+    where_detected = external["accuracy_where_detected"]
+    # The generous framing must never be the headline: an undetected hand is a
+    # failure to answer, and quoting only the detected subset would hide it.
+    assert over_all < where_detected
+    site = _flat("site/index.html")
+    assert f"{_percent(over_all)}%" in site
+    assert "undetected counts as wrong" in site or "counts as a wrong answer" in site
+
+
+def test_landmark_detection_rate_is_disclosed() -> None:
+    rate = _percent(_landmark()["external_final"]["detection_rate"])
+    # 96.92 -> the page rounds to one decimal, so accept either rendering.
+    site = _flat("site/index.html")
+    assert f"{rate}%" in site or f"{float(rate):.1f}%" in site
+
+
+def test_landmark_parameter_count_is_quoted_consistently() -> None:
+    count = _landmark()["checkpoint"]["parameter_count"]
+    assert f"{count:,}" in _flat("site/index.html")
+
+
+def test_both_classifiers_are_named_on_the_page() -> None:
+    site = _flat("site/index.html")
+    pixel = _percent(METRICS["external"]["accuracy"])
+    landmark = _percent(_landmark()["external_final"]["accuracy_over_all_images"])
+    # The comparison is the result. Neither number may quietly disappear.
+    assert f"{pixel}%" in site
+    assert f"{landmark}%" in site

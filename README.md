@@ -37,10 +37,18 @@ system.
 | Previous compact CNN | Untouched test partition from the training corpus | 15,600 | 99.82% | 99.82% |
 | Previous compact CNN | Separate external capture source | 780 | 17.56% | 16.82% |
 | Maintained compact CNN | Untouched test partition from the training corpus | 15,600 | 98.92% | 98.93% |
-| Maintained compact CNN | Separate external capture source | 780 | **31.67%** | 31.74% |
+| Maintained compact CNN | Separate external capture source | 780 | 31.67% | 31.74% |
+| Landmark classifier | Separate external capture source, reserved half | 390 | **84.62%** | 86.32% |
 
 The maintained model classified 15,432 of 15,600 internal test images correctly, but only 247 of
 780 external images. The 67.25 percentage-point gap is evidence of severe capture-domain bias.
+
+A second classifier reads hand geometry rather than pixels. MediaPipe supplies 21 hand keypoints;
+normalising away position, scale, in-plane rotation, and handedness leaves a description of hand shape
+that carries nothing about how the photograph was taken. On held-out captures from a separate source it
+scores **84.62%** against the pixel model's 31.67%, counting an undetected hand as a wrong answer. It has
+57,498 parameters and trains in 98 seconds. Details, including why it scores *lower* on the primary corpus
+than on external photographs, are in [docs/results/robustness.md](docs/results/robustness.md).
 
 External accuracy nearly doubled, from 17.56% to 31.67%, for a 0.90-point cost on the same-corpus
 test. The gain came from changing the training-augmentation recipe alone; architecture, image size,
