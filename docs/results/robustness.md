@@ -239,3 +239,20 @@ distances, and cameras -- rather than more of the same kind of data.
 The supplementary-corpus pipeline is retained in the repository because the
 experiment is reproducible from it, and because a genuinely diverse source could
 be dropped into the same path unchanged.
+
+## A note on browser versus CLI confidence
+
+The published page and the Python CLI report the same predicted letter for the
+same image but slightly different confidences -- about 79.6% in the browser
+against 76.2% from the CLI on the held-out A sample.
+
+This is not a weight mismatch. `tools/check_browser_model.mjs` compares the
+browser forward pass against PyTorch on a synthetic tensor and agrees to within
+6e-8, one float32 ulp. What differs is everything *before* the tensor: the
+browser resizes with a canvas `drawImage`, the CLI resizes with Pillow, and the
+two resamplers do not produce identical 64x64 pixels from a 400x400 source.
+
+It is a useful reminder that a model contract is not only its weights. Two
+faithful implementations of the same network disagree measurably when their
+preprocessing differs, and this model is sensitive enough to capture conditions
+that a small resampling difference moves its confidence by three points.
